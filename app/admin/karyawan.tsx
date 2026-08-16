@@ -29,6 +29,11 @@ export default function AdminKaryawanScreen() {
   const [divisionId, setDivisionId] = useState<number | null>(null);
   const [status, setStatus] = useState<'active' | 'inactive'>('active');
   const [role, setRole] = useState<'admin' | 'employee'>('employee');
+  const [nik, setNik] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
+  const [gender, setGender] = useState<'male' | 'female' | null>(null);
+  const [birthDate, setBirthDate] = useState('');
   const [importVisible, setImportVisible] = useState(false);
   const [importBusy, setImportBusy] = useState(false);
 
@@ -58,6 +63,11 @@ export default function AdminKaryawanScreen() {
     setDivisionId(emp.divisionId);
     setStatus(emp.status);
     setRole(emp.role);
+    setNik(emp.nik ?? '');
+    setPhone(emp.phone ?? '');
+    setAddress(emp.address ?? '');
+    setGender(emp.gender ?? null);
+    setBirthDate(emp.birthDate ?? '');
   };
 
   const save = async (userId: string) => {
@@ -71,6 +81,11 @@ export default function AdminKaryawanScreen() {
           divisionId,
           status,
           role,
+          nik: nik.trim() || null,
+          phone: phone.trim() || null,
+          address: address.trim() || null,
+          gender,
+          birthDate: birthDate || null,
         },
       });
       setOpenId(null);
@@ -191,6 +206,48 @@ export default function AdminKaryawanScreen() {
                     </Pressable>
                   </View>
 
+                  <Text style={styles.fieldLabel}>Biodata</Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="NIK (16 digit)"
+                    placeholderTextColor={colors.ink38}
+                    keyboardType="number-pad"
+                    maxLength={16}
+                    value={nik}
+                    onChangeText={(v) => setNik(v.replace(/[^\d]/g, ''))}
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Nomor HP / WhatsApp"
+                    placeholderTextColor={colors.ink38}
+                    keyboardType="phone-pad"
+                    value={phone}
+                    onChangeText={setPhone}
+                  />
+                  <TextInput
+                    style={[styles.input, styles.addressInput]}
+                    placeholder="Alamat tempat tinggal"
+                    placeholderTextColor={colors.ink38}
+                    multiline
+                    value={address}
+                    onChangeText={setAddress}
+                  />
+                  <View style={styles.toggleRow}>
+                    <Pressable
+                      style={({ pressed }) => [styles.toggle, gender === 'male' && styles.toggleActive, pressed && styles.pressed]}
+                      onPress={() => setGender(gender === 'male' ? null : 'male')}
+                    >
+                      <Text style={[styles.toggleText, gender === 'male' && styles.toggleTextActive]}>Laki-laki</Text>
+                    </Pressable>
+                    <Pressable
+                      style={({ pressed }) => [styles.toggle, gender === 'female' && styles.toggleActive, pressed && styles.pressed]}
+                      onPress={() => setGender(gender === 'female' ? null : 'female')}
+                    >
+                      <Text style={[styles.toggleText, gender === 'female' && styles.toggleTextActive]}>Perempuan</Text>
+                    </Pressable>
+                  </View>
+                  <DateField label="Tanggal Lahir" value={birthDate} onChange={setBirthDate} maximumDate={new Date()} />
+
                   <Pressable
                     style={({ pressed }) => [styles.saveBtn, pressed && styles.pressed]}
                     onPress={() => save(emp.userId)}
@@ -212,11 +269,11 @@ export default function AdminKaryawanScreen() {
       <CsvImportModal
         visible={importVisible}
         title="Import Data Karyawan"
-        hint="Kolom: nama,email,peran,divisi,jabatan,tanggal_masuk,status. Dicocokkan dengan EMAIL yang sudah terdaftar — tidak membuat akun baru."
-        placeholder={'nama,email,peran,divisi,jabatan,tanggal_masuk,status\nBudi Santoso,budi@carumby.id,employee,Gudang,Staff Gudang,2026-01-05,active'}
+        hint="Kolom: nama,email,peran,divisi,jabatan,tanggal_masuk,status,nik,telepon,alamat,jenis_kelamin,tanggal_lahir. Dicocokkan dengan EMAIL yang sudah terdaftar — tidak membuat akun baru."
+        placeholder={'nama,email,peran,divisi,jabatan,tanggal_masuk,status,nik,telepon,alamat,jenis_kelamin,tanggal_lahir\nBudi Santoso,budi@carumby.id,employee,Gudang,Staff Gudang,2026-01-05,active,3210987654321098,08123456789,"Jl. Raya Sumedang No. 1",Laki-laki,1998-04-12'}
         template={{
           filename: 'template-data-karyawan.csv',
-          content: 'nama,email,peran,divisi,jabatan,tanggal_masuk,status\nBudi Santoso,budi@carumby.id,employee,Gudang,Staff Gudang,2026-01-05,active',
+          content: 'nama,email,peran,divisi,jabatan,tanggal_masuk,status,nik,telepon,alamat,jenis_kelamin,tanggal_lahir\nBudi Santoso,budi@carumby.id,employee,Gudang,Staff Gudang,2026-01-05,active,3210987654321098,08123456789,"Jl. Raya Sumedang No. 1",Laki-laki,1998-04-12',
         }}
         busy={importBusy}
         onSubmit={doImport}
@@ -311,6 +368,10 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.regular,
     fontSize: font.body,
     color: colors.ink,
+  },
+  addressInput: {
+    minHeight: 64,
+    textAlignVertical: 'top',
   },
   chipRow: {
     flexDirection: 'row',

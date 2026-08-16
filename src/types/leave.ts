@@ -64,6 +64,11 @@ export interface EmployeeRecord {
   position: string | null;
   joinDate: string | null;
   status: 'active' | 'inactive';
+  nik: string | null;
+  phone: string | null;
+  address: string | null;
+  gender: 'male' | 'female' | null;
+  birthDate: string | null;
   createdAt: Date;
 }
 
