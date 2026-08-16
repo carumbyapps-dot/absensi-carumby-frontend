@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Image,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -206,7 +207,10 @@ export default function AbsenScreen() {
         <View style={styles.confirmBack} />
       </View>
 
-      <View style={styles.confirmBody}>
+      <ScrollView
+        contentContainerStyle={styles.confirmBody}
+        showsVerticalScrollIndicator={false}
+      >
         {photo && (
           <View style={styles.photoWrap}>
             <Image source={{ uri: photo.uri }} style={styles.photo} resizeMode="cover" />
@@ -295,7 +299,7 @@ export default function AbsenScreen() {
             <Text style={styles.primaryButtonText}>{submitting ? 'Mengirim…' : 'Kirim'}</Text>
           </Pressable>
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 }

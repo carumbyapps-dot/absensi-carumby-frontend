@@ -1,7 +1,7 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts, Archivo_400Regular, Archivo_600SemiBold, Archivo_700Bold, Archivo_800ExtraBold } from '@expo-google-fonts/archivo';
-import { AuthProvider } from '@/store/auth';
+import { AuthProvider, useAuth } from '@/store/auth';
 import { AttendanceProvider } from '@/store/attendance';
 
 export default function RootLayout() {
@@ -19,13 +19,26 @@ export default function RootLayout() {
   return (
     <AuthProvider>
       <AttendanceProvider>
-        <StatusBar style="dark" />
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: '#EDEBE5' },
-          }}
-        >
+        <RootNavigator />
+      </AttendanceProvider>
+    </AuthProvider>
+  );
+}
+
+function RootNavigator() {
+  const { status } = useAuth();
+  const isAuthenticated = status === 'authenticated';
+
+  return (
+    <>
+      <StatusBar style="dark" />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: '#EDEBE5' },
+        }}
+      >
+        <Stack.Protected guard={isAuthenticated}>
           <Stack.Screen name="index" />
           <Stack.Screen name="absen" />
           <Stack.Screen name="riwayat" options={{ headerShown: true, title: 'Riwayat Absen' }} />
@@ -34,16 +47,21 @@ export default function RootLayout() {
           <Stack.Screen name="cuti" options={{ headerShown: true, title: 'Cuti & Izin' }} />
           <Stack.Screen name="cuti-form" options={{ headerShown: true, title: 'Ajukan Cuti / Izin' }} />
           <Stack.Screen name="kalender" options={{ headerShown: true, title: 'Kalender Libur' }} />
+          <Stack.Screen name="gaji" options={{ headerShown: true, title: 'Gaji & Slip' }} />
           <Stack.Screen name="admin/index" options={{ headerShown: true, title: 'Panel Admin' }} />
           <Stack.Screen name="admin/approve" options={{ headerShown: true, title: 'Persetujuan Cuti' }} />
           <Stack.Screen name="admin/divisi" options={{ headerShown: true, title: 'Kelola Divisi' }} />
           <Stack.Screen name="admin/karyawan" options={{ headerShown: true, title: 'Data Karyawan' }} />
           <Stack.Screen name="admin/libur" options={{ headerShown: true, title: 'Kelola Hari Libur' }} />
-          <Stack.Screen name="gaji" options={{ headerShown: true, title: 'Gaji & Slip' }} />
           <Stack.Screen name="admin/gaji" options={{ headerShown: true, title: 'Kelola Gaji' }} />
           <Stack.Screen name="admin/payroll" options={{ headerShown: true, title: 'Payroll' }} />
-        </Stack>
-      </AttendanceProvider>
-    </AuthProvider>
+        </Stack.Protected>
+        <Stack.Protected guard={!isAuthenticated}>
+          <Stack.Screen name="login" />
+          <Stack.Screen name="register" options={{ headerShown: true, title: 'Daftar Akun' }} />
+          <Stack.Screen name="reset" options={{ headerShown: true, title: 'Atur Ulang Kata Sandi' }} />
+        </Stack.Protected>
+      </Stack>
+    </>
   );
 }
