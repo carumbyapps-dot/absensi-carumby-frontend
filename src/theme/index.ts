@@ -28,6 +28,7 @@ export const colors = {
 export const statusColors = {
   on_time: { bg: colors.lumut, fg: colors.bone },
   late: { bg: colors.red, fg: colors.bone },
+  early_out: { bg: colors.tanah, fg: colors.ink },
   none: { bg: colors.ink12, fg: colors.ink38 },
 } as const;
 

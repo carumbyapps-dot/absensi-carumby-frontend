@@ -53,6 +53,7 @@ function RootNavigator() {
           <Stack.Screen name="admin/divisi" options={{ headerShown: true, title: 'Kelola Divisi' }} />
           <Stack.Screen name="admin/karyawan" options={{ headerShown: true, title: 'Data Karyawan' }} />
           <Stack.Screen name="admin/libur" options={{ headerShown: true, title: 'Kelola Hari Libur' }} />
+          <Stack.Screen name="admin/jadwal" options={{ headerShown: true, title: 'Jadwal Kerja' }} />
           <Stack.Screen name="admin/gaji" options={{ headerShown: true, title: 'Kelola Gaji' }} />
           <Stack.Screen name="admin/payroll" options={{ headerShown: true, title: 'Payroll' }} />
         </Stack.Protected>

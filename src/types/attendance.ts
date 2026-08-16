@@ -1,6 +1,6 @@
 export type AttendanceType = 'in' | 'out';
 
-export type AttendanceStatus = 'on_time' | 'late';
+export type AttendanceStatus = 'on_time' | 'late' | 'early_out';
 
 export interface AttendanceRecord {
   id: string;
@@ -16,6 +16,7 @@ export interface AttendanceRecord {
 export const STATUS_LABEL: Record<AttendanceStatus, string> = {
   on_time: 'Tepat Waktu',
   late: 'Terlambat',
+  early_out: 'Pulang Awal',
 };
 
 export const TYPE_LABEL: Record<AttendanceType, string> = {

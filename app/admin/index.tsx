@@ -22,6 +22,12 @@ export default function AdminScreen() {
           subtitle="Divisi, jabatan, tanggal masuk, peran"
           onPress={() => router.push('/admin/karyawan')}
         />
+        <MenuCard
+          icon="time-outline"
+          title="Jadwal Kerja"
+          subtitle="Shift per karyawan per tanggal (host live, packer)"
+          onPress={() => router.push('/admin/jadwal')}
+        />
       </View>
       <View style={styles.section}>
         <Text style={styles.sectionLabel}>Referensi</Text>

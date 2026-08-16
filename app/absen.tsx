@@ -17,7 +17,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, font, fontFamily, numerals, spacing, typography } from '@/theme';
 import { useAttendance } from '@/store/attendance';
 import { useNow, formatClock } from '@/hooks/useNow';
-import { getErrorMessage } from '@/lib/api';
+import { apiFetch, getErrorMessage, toDateKey } from '@/lib/api';
+import type { WorkScheduleRecord } from '@/types/schedule';
 import { AttendanceRecord } from '@/types/attendance';
 import MapPreview from '@/components/MapPreview';
 
@@ -67,6 +68,22 @@ export default function AbsenScreen() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [savedRecord, setSavedRecord] = useState<AttendanceRecord | null>(null);
+  const [shift, setShift] = useState<{ startTime: string; endTime: string } | null>(null);
+
+  useEffect(() => {
+    const today = toDateKey(new Date());
+    const nowD = new Date();
+    apiFetch<{ schedules: WorkScheduleRecord[] }>(
+      `/api/schedules/mine?year=${nowD.getFullYear()}&month=${nowD.getMonth() + 1}`,
+    )
+      .then((r) => {
+        const s = r.schedules.find((x) => x.date === today);
+        setShift(s ? { startTime: s.startTime, endTime: s.endTime } : null);
+      })
+      .catch(() => {
+        setShift(null);
+      });
+  }, []);
 
   const captureLocation = async () => {
     setLocationState('loading');
@@ -264,6 +281,21 @@ export default function AbsenScreen() {
             <Text style={styles.blockLabel}>Waktu Dicatat</Text>
           </View>
           <Text style={styles.timeText}>{formatClock(now)}</Text>
+        </View>
+
+        <View style={styles.block}>
+          <View style={styles.blockRow}>
+            <Ionicons name="calendar-outline" size={16} color={colors.ink} />
+            <Text style={styles.blockLabel}>Jadwal Hari Ini</Text>
+          </View>
+          <Text style={styles.scheduleText}>
+            {shift ? `Shift ${shift.startTime}–${shift.endTime}` : 'Jam kerja standar'}
+          </Text>
+          {mode === 'out' && (
+            <Text style={styles.scheduleNote}>
+              Keluar sebelum jam selesai akan tercatat sebagai Pulang Awal.
+            </Text>
+          )}
         </View>
 
         {submitError && (
@@ -484,6 +516,17 @@ const styles = StyleSheet.create({
     fontSize: font.d2,
     color: colors.ink,
     letterSpacing: 0.4,
+  },
+  scheduleText: {
+    ...numerals,
+    fontFamily: fontFamily.bold,
+    fontSize: font.body,
+    color: colors.ink,
+  },
+  scheduleNote: {
+    fontFamily: fontFamily.regular,
+    fontSize: font.caption,
+    color: colors.ink60,
   },
   errorBox: {
     flexDirection: 'row',
