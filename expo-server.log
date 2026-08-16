@@ -1,0 +1,10 @@
+Starting project at C:\Users\Vollm\Projects\absensi carumby\frontend
+Starting Metro Bundler
+Waiting on http://localhost:8081
+Logs for your project will appear below.
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android node_modules\expo-router\entry.js ▓▓▓▓░░░░░░░░░░░░ 27.6% (207/394)
+Android node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓▓▓░░░░░ 72.1% (775/919)
+Android Bundled 9828ms node_modules\expo-router\entry.js (1248 modules)
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 587ms node_modules\expo-router\entry.js (1248 modules)
