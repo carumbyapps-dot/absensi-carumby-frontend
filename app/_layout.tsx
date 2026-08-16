@@ -59,6 +59,7 @@ function RootNavigator() {
           <Stack.Screen name="admin/gaji" options={{ headerShown: true, title: 'Kelola Gaji' }} />
           <Stack.Screen name="admin/payroll" options={{ headerShown: true, title: 'Payroll' }} />
           <Stack.Screen name="admin/pengumuman" options={{ headerShown: true, title: 'Kirim Pengumuman' }} />
+          <Stack.Screen name="admin/absen-manual" options={{ headerShown: true, title: 'Absen Manual' }} />
         </Stack.Protected>
         <Stack.Protected guard={!isAuthenticated}>
           <Stack.Screen name="login" />

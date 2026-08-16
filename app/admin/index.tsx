@@ -23,6 +23,12 @@ export default function AdminScreen() {
           onPress={() => router.push('/admin/pengumuman')}
         />
         <MenuCard
+          icon="create-outline"
+          title="Absen Manual"
+          subtitle="Input absen karyawan yang terkendala perangkat/jaringan"
+          onPress={() => router.push('/admin/absen-manual')}
+        />
+        <MenuCard
           icon="people-outline"
           title="Data Karyawan"
           subtitle="Divisi, jabatan, tanggal masuk, peran"

@@ -11,6 +11,8 @@ export interface AttendanceRecord {
   longitude: number | null;
   timestamp: string;
   status: AttendanceStatus | null;
+  source: 'self' | 'manual';
+  note: string | null;
 }
 
 export const STATUS_LABEL: Record<AttendanceStatus, string> = {

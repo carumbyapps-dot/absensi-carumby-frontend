@@ -85,6 +85,12 @@ export default function DetailScreen() {
           label="Status"
           value={record.status === 'on_time' ? 'Tepat Waktu' : record.status === 'late' ? 'Terlambat' : record.status === 'early_out' ? 'Pulang Awal' : 'Belum ada status'}
         />
+        {record.source === 'manual' && (
+          <>
+            <InfoRow label="Sumber" value="Absen Manual (diinput admin)" />
+            <InfoRow label="Alasan" value={record.note ?? '-'} />
+          </>
+        )}
       </View>
     </View>
   );

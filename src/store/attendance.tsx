@@ -20,7 +20,9 @@ interface RawAttendance {
   latitude: number | null;
   longitude: number | null;
   timestamp: string;
-  status: 'on_time' | 'late' | null;
+  status: 'on_time' | 'late' | 'early_out' | null;
+  source?: 'self' | 'manual';
+  note?: string | null;
   createdAt: string;
 }
 
@@ -44,6 +46,8 @@ function normalizeAttendance(raw: RawAttendance): AttendanceRecord {
     longitude: raw.longitude,
     timestamp: raw.timestamp,
     status: raw.status,
+    source: raw.source ?? 'self',
+    note: raw.note ?? null,
   };
 }
 

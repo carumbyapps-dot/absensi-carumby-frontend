@@ -28,7 +28,10 @@ export default function AttendanceRow({ record }: Props) {
       <View style={[styles.iconWrap, { borderColor: isIn ? colors.lumut : colors.ink }]}>
         <Ionicons name={icon} size={16} color={iconColor} />
       </View>
-      <Text style={styles.title}>{TYPE_LABEL[record.type]}</Text>
+      <Text style={styles.title}>
+        {TYPE_LABEL[record.type]}
+        {record.source === 'manual' ? ' · Manual' : ''}
+      </Text>
       <Text style={styles.time}>{formatTime(record.timestamp)}</Text>
       <StatusBadge status={record.status} />
     </Pressable>
