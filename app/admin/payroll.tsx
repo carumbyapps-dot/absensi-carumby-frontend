@@ -12,6 +12,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { apiFetch, getErrorMessage } from '@/lib/api';
 import { downloadPayrollSlip } from '@/lib/download';
+import { downloadCsv } from '@/lib/export';
 import { colors, font, fontFamily, spacing, typography } from '@/theme';
 import {
   formatRupiah,
@@ -120,6 +121,15 @@ export default function AdminPayrollScreen() {
     if (!ok) Alert.alert('Belum tersedia', 'Unduhan PDF saat ini hanya tersedia di versi web.');
   };
 
+  const exportCsv = async () => {
+    const ok = await downloadCsv(`/api/payroll/export?year=${year}&month=${month}`);
+    if (ok === null) {
+      Alert.alert('Gagal mengekspor', 'Tidak ada slip pada periode ini atau terjadi kesalahan.');
+    } else if (!ok) {
+      Alert.alert('CSV disalin', 'CSV disalin ke clipboard — tempel di Excel/Sheets.');
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
       <Text style={styles.sectionLabel}>Periode</Text>
@@ -211,7 +221,13 @@ export default function AdminPayrollScreen() {
       )}
 
       <View style={styles.sectionBlock}>
-        <Text style={styles.sectionLabel}>Rekap {periodLabel(year, month)} ({saved.length})</Text>
+        <View style={styles.rekapHead}>
+          <Text style={[styles.sectionLabel, styles.rekapLabel]}>Rekap {periodLabel(year, month)} ({saved.length})</Text>
+          <Pressable style={({ pressed }) => [styles.exportBtn, pressed && styles.pressed]} onPress={exportCsv}>
+            <Ionicons name="share-outline" size={13} color={colors.ink} />
+            <Text style={styles.exportBtnText}>Export CSV</Text>
+          </Pressable>
+        </View>
         {loadingSaved ? (
           <View style={styles.stateBox}>
             <ActivityIndicator color={colors.ink} />
@@ -414,6 +430,29 @@ const styles = StyleSheet.create({
   },
   sectionBlock: {
     marginTop: spacing.xl,
+  },
+  rekapHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  rekapLabel: {
+    marginTop: spacing.lg,
+  },
+  exportBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    borderWidth: 1,
+    borderColor: colors.ink,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    marginTop: spacing.lg,
+  },
+  exportBtnText: {
+    ...typography.label,
+    fontSize: 9,
+    color: colors.ink,
   },
   resultCard: {
     borderWidth: 1,

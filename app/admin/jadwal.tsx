@@ -11,6 +11,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { apiFetch, getErrorMessage } from '@/lib/api';
+import { downloadCsv, importCsv } from '@/lib/export';
+import CsvImportModal from '@/components/CsvImportModal';
 import { colors, font, fontFamily, spacing, typography } from '@/theme';
 import type { EmployeeRecord } from '@/types/leave';
 import { MONTH_LABEL } from '@/types/payroll';
@@ -34,6 +36,8 @@ export default function AdminJadwalScreen() {
   const [endTime, setEndTime] = useState('');
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [importVisible, setImportVisible] = useState(false);
+  const [importBusy, setImportBusy] = useState(false);
 
   const loadEmployees = useCallback(async () => {
     try {
@@ -150,6 +154,31 @@ export default function AdminJadwalScreen() {
 
   const existing = selectedDate ? scheduleByDate.get(selectedDate) : null;
 
+  const doImport = async (csv: string) => {
+    if (!selectedId) return;
+    setImportBusy(true);
+    try {
+      const res = await importCsv('/api/schedules/import', { userId: selectedId, csv });
+      Alert.alert('Impor selesai', res?.message ?? '');
+      setImportVisible(false);
+      await loadSchedules();
+    } catch (err) {
+      Alert.alert('Impor gagal', getErrorMessage(err));
+    } finally {
+      setImportBusy(false);
+    }
+  };
+
+  const doExport = async () => {
+    if (!selectedId) return;
+    const ok = await downloadCsv(`/api/schedules/export?userId=${selectedId}&year=${year}&month=${month}`);
+    if (ok === null) {
+      Alert.alert('Gagal mengekspor', 'Tidak dapat mengambil data.');
+    } else if (!ok) {
+      Alert.alert('CSV disalin', 'CSV disalin ke clipboard — tempel di Excel/Sheets.');
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
       <Text style={styles.sectionLabel}>Karyawan</Text>
@@ -193,6 +222,17 @@ export default function AdminJadwalScreen() {
             <Text style={[styles.chipText, month === i + 1 && styles.chipTextActive]}>{label.slice(0, 3)}</Text>
           </Pressable>
         ))}
+      </View>
+
+      <View style={styles.ioRow}>
+        <Pressable style={({ pressed }) => [styles.ioBtn, pressed && styles.pressed]} onPress={() => setImportVisible(true)} disabled={!selectedId}>
+          <Ionicons name="download-outline" size={14} color={colors.ink} />
+          <Text style={styles.ioBtnText}>Import CSV</Text>
+        </Pressable>
+        <Pressable style={({ pressed }) => [styles.ioBtn, pressed && styles.pressed]} onPress={doExport} disabled={!selectedId}>
+          <Ionicons name="share-outline" size={14} color={colors.ink} />
+          <Text style={styles.ioBtnText}>Export CSV</Text>
+        </Pressable>
       </View>
 
       {selectedDate && (
@@ -271,6 +311,16 @@ export default function AdminJadwalScreen() {
         })}
       </View>
       <Text style={styles.hint}>Tap tanggal untuk menambah/mengubah jadwal shift. Tanggal tanpa jadwal memakai jam kerja standar.</Text>
+
+      <CsvImportModal
+        visible={importVisible}
+        title={`Import Jadwal — ${MONTH_LABEL[month - 1]} ${year}`}
+        hint="Kolom: tanggal,jam_mulai,jam_selesai — satu baris per tanggal. Baris bermasalah dilewati dan dilaporkan."
+        placeholder={'tanggal,jam_mulai,jam_selesai\n2026-09-01,13:00,21:00\n2026-09-02,13:00,21:00'}
+        busy={importBusy}
+        onSubmit={doImport}
+        onClose={() => setImportVisible(false)}
+      />
     </ScrollView>
   );
 }
@@ -360,6 +410,26 @@ const styles = StyleSheet.create({
   },
   chipTextActive: {
     color: colors.bone,
+  },
+  ioRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    marginTop: spacing.lg,
+  },
+  ioBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
+    borderWidth: 1,
+    borderColor: colors.ink,
+    paddingVertical: spacing.sm,
+  },
+  ioBtnText: {
+    ...typography.label,
+    fontSize: 10,
+    color: colors.ink,
   },
   editBox: {
     marginTop: spacing.lg,

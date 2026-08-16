@@ -28,6 +28,12 @@ export default function AdminScreen() {
           subtitle="Shift per karyawan per tanggal (host live, packer)"
           onPress={() => router.push('/admin/jadwal')}
         />
+        <MenuCard
+          icon="document-text-outline"
+          title="Rekap Absensi"
+          subtitle="Export rekap absensi bulanan (CSV)"
+          onPress={() => router.push('/admin/rekap')}
+        />
       </View>
       <View style={styles.section}>
         <Text style={styles.sectionLabel}>Referensi</Text>

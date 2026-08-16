@@ -11,6 +11,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { apiFetch, getErrorMessage } from '@/lib/api';
+import { downloadCsv, importCsv } from '@/lib/export';
+import CsvImportModal from '@/components/CsvImportModal';
 import { colors, font, fontFamily, spacing, typography } from '@/theme';
 import { Division, EmployeeRecord } from '@/types/leave';
 import DateField from '@/components/DateField';
@@ -27,6 +29,8 @@ export default function AdminKaryawanScreen() {
   const [divisionId, setDivisionId] = useState<number | null>(null);
   const [status, setStatus] = useState<'active' | 'inactive'>('active');
   const [role, setRole] = useState<'admin' | 'employee'>('employee');
+  const [importVisible, setImportVisible] = useState(false);
+  const [importBusy, setImportBusy] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -78,8 +82,41 @@ export default function AdminKaryawanScreen() {
     }
   };
 
+  const doImport = async (csv: string) => {
+    setImportBusy(true);
+    try {
+      const res = await importCsv('/api/employees/import', { csv });
+      Alert.alert('Impor selesai', res?.message ?? '');
+      setImportVisible(false);
+      await load();
+    } catch (err) {
+      Alert.alert('Impor gagal', getErrorMessage(err));
+    } finally {
+      setImportBusy(false);
+    }
+  };
+
+  const doExport = async () => {
+    const ok = await downloadCsv('/api/employees/export');
+    if (ok === null) {
+      Alert.alert('Gagal mengekspor', 'Tidak dapat mengambil data.');
+    } else if (!ok) {
+      Alert.alert('CSV disalin', 'CSV disalin ke clipboard — tempel di Excel/Sheets.');
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <View style={styles.ioRow}>
+        <Pressable style={({ pressed }) => [styles.ioBtn, pressed && styles.pressed]} onPress={() => setImportVisible(true)}>
+          <Ionicons name="download-outline" size={14} color={colors.ink} />
+          <Text style={styles.ioBtnText}>Import CSV</Text>
+        </Pressable>
+        <Pressable style={({ pressed }) => [styles.ioBtn, pressed && styles.pressed]} onPress={doExport}>
+          <Ionicons name="share-outline" size={14} color={colors.ink} />
+          <Text style={styles.ioBtnText}>Export CSV</Text>
+        </Pressable>
+      </View>
       <Text style={styles.sectionLabel}>Karyawan ({employees.length})</Text>
       {loading ? (
         <View style={styles.stateBox}>
@@ -171,6 +208,16 @@ export default function AdminKaryawanScreen() {
           );
         })
       )}
+
+      <CsvImportModal
+        visible={importVisible}
+        title="Import Data Karyawan"
+        hint="Kolom: nama,email,peran,divisi,jabatan,tanggal_masuk,status. Dicocokkan dengan EMAIL yang sudah terdaftar — tidak membuat akun baru."
+        placeholder={'nama,email,peran,divisi,jabatan,tanggal_masuk,status\nBudi Santoso,budi@carumby.id,employee,Gudang,Staff Gudang,2026-01-05,active'}
+        busy={importBusy}
+        onSubmit={doImport}
+        onClose={() => setImportVisible(false)}
+      />
     </ScrollView>
   );
 }
@@ -185,6 +232,26 @@ const styles = StyleSheet.create({
     color: colors.ink,
     fontSize: 12,
     marginBottom: spacing.md,
+  },
+  ioRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    marginBottom: spacing.lg,
+  },
+  ioBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
+    borderWidth: 1,
+    borderColor: colors.ink,
+    paddingVertical: spacing.sm,
+  },
+  ioBtnText: {
+    ...typography.label,
+    fontSize: 10,
+    color: colors.ink,
   },
   stateBox: {
     alignItems: 'center',

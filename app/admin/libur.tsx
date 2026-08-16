@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { apiFetch, getErrorMessage } from '@/lib/api';
+import { downloadCsv } from '@/lib/export';
 import { colors, font, fontFamily, spacing, typography } from '@/theme';
 import { formatDateLong, Holiday, HOLIDAY_TYPE_LABEL } from '@/types/leave';
 import DateField from '@/components/DateField';
@@ -114,6 +115,15 @@ export default function AdminLiburScreen() {
     ]);
   };
 
+  const doExport = async () => {
+    const ok = await downloadCsv(`/api/holidays/export?year=${year}`);
+    if (ok === null) {
+      Alert.alert('Gagal mengekspor', 'Tidak dapat mengambil data.');
+    } else if (!ok) {
+      Alert.alert('CSV disalin', 'CSV disalin ke clipboard — tempel di Excel/Sheets.');
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
       <View style={styles.yearRow}>
@@ -125,6 +135,11 @@ export default function AdminLiburScreen() {
           <Ionicons name="chevron-forward" size={18} color={colors.ink} />
         </Pressable>
       </View>
+
+      <Pressable style={({ pressed }) => [styles.exportBtn, pressed && styles.pressed]} onPress={doExport}>
+        <Ionicons name="share-outline" size={14} color={colors.ink} />
+        <Text style={styles.exportBtnText}>Export CSV ({year})</Text>
+      </Pressable>
 
       <Text style={styles.sectionLabel}>Tambah Hari Libur</Text>
       <DateField label="Tanggal" value={formDate} onChange={setFormDate} />
@@ -212,6 +227,21 @@ const styles = StyleSheet.create({
     fontSize: 20,
     minWidth: 80,
     textAlign: 'center',
+  },
+  exportBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
+    borderWidth: 1,
+    borderColor: colors.ink,
+    paddingVertical: spacing.sm,
+    marginBottom: spacing.lg,
+  },
+  exportBtnText: {
+    ...typography.label,
+    fontSize: 10,
+    color: colors.ink,
   },
   sectionLabel: {
     ...typography.label,
