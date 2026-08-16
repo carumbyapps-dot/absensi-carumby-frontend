@@ -1,4 +1,6 @@
+import { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { Link, useRouter, type Href } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -7,16 +9,63 @@ import { colors, font, fontFamily, numerals, radius, spacing, typography } from 
 import { useNow, formatClock, formatDateLong, greeting } from '@/hooks/useNow';
 import { useRecordsForDate } from '@/store/attendance';
 import { useAuth } from '@/store/auth';
+import { apiFetch, toDateKey } from '@/lib/api';
+import { scheduleShiftReminders, notifyAnnouncement } from '@/lib/notifications';
+import { ANNOUNCEMENT_LAST_SEEN_KEY, AnnouncementRecord } from '@/types/announcement';
+import { WorkScheduleRecord } from '@/types/schedule';
 import AttendanceRow from '@/components/AttendanceRow';
 import MenuCard from '@/components/MenuCard';
+import BrandMark from '@/components/BrandMark';
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const now = useNow();
-  const { user } = useAuth();
+  const { user, status } = useAuth();
   const { records, loading, error, reload } = useRecordsForDate(new Date());
   const todayRecords = records ?? [];
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (status !== 'authenticated') return;
+    let active = true;
+    (async () => {
+      const nowD = new Date();
+      // 1. Pengingat shift hari ini (10 menit sebelum masuk & pulang)
+      try {
+        const s = await apiFetch<{ schedules: WorkScheduleRecord[] }>(
+          `/api/schedules/mine?year=${nowD.getFullYear()}&month=${nowD.getMonth() + 1}`,
+        );
+        const todayShift = s.schedules.find((x) => x.date === toDateKey(nowD));
+        await scheduleShiftReminders({
+          startTime: todayShift?.startTime ?? '08:00',
+          endTime: todayShift?.endTime ?? '17:00',
+          date: nowD,
+        });
+      } catch {
+        // pengingat opsional — jangan ganggu layar utama
+      }
+      // 2. Deteksi pengumuman baru
+      try {
+        const a = await apiFetch<{ announcements: AnnouncementRecord[] }>('/api/announcements');
+        const lastRaw = await AsyncStorage.getItem(ANNOUNCEMENT_LAST_SEEN_KEY);
+        const lastId = lastRaw ? Number(lastRaw) : 0;
+        const newest = a.announcements[0];
+        if (newest && newest.id > lastId) {
+          if (!active) return;
+          setUnreadCount(a.announcements.filter((x) => x.id > lastId).length);
+          if (lastId > 0) {
+            await notifyAnnouncement(newest.title, newest.body);
+          }
+        }
+      } catch {
+        // opsional
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [status]);
 
   const hasCheckedIn = todayRecords.some((r) => r.type === 'in');
   const hasCheckedOut = todayRecords.some((r) => r.type === 'out');
@@ -45,10 +94,13 @@ export default function HomeScreen() {
         }
       >
         <View style={styles.header}>
-          <View>
-            <Text style={styles.greeting}>{greeting(now)}</Text>
-            <Text style={styles.headerName}>{displayName}</Text>
-            <Text style={styles.headerDate}>{formatDateLong(now)}</Text>
+          <View style={styles.headerLeft}>
+            <BrandMark size={34} />
+            <View>
+              <Text style={styles.greeting}>{greeting(now)}</Text>
+              <Text style={styles.headerName}>{displayName}</Text>
+              <Text style={styles.headerDate}>{formatDateLong(now)}</Text>
+            </View>
           </View>
           <Link href="/profil" asChild>
             <Pressable style={({ pressed }) => [styles.avatar, pressed && styles.pressed]}>
@@ -116,6 +168,16 @@ export default function HomeScreen() {
             subtitle="Slip gaji bulanan dan unduh PDF"
             onPress={() => router.push('/gaji')}
           />
+          <MenuCard
+            icon="megaphone-outline"
+            iconColor={unreadCount > 0 ? colors.red : colors.ink}
+            title="Pengumuman"
+            subtitle={unreadCount > 0 ? `${unreadCount} pengumuman baru` : 'Himbauan & info dari HRD'}
+            onPress={() => {
+              setUnreadCount(0);
+              router.push('/pengumuman');
+            }}
+          />
           {user?.role === 'admin' && (
             <MenuCard
               icon="shield-checkmark-outline"
@@ -180,6 +242,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     paddingVertical: spacing.lg,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.md,
   },
   greeting: {
     ...typography.label,

@@ -17,6 +17,12 @@ export default function AdminScreen() {
           onPress={() => router.push('/admin/approve')}
         />
         <MenuCard
+          icon="megaphone-outline"
+          title="Pengumuman"
+          subtitle="Kirim himbauan ke semua karyawan"
+          onPress={() => router.push('/admin/pengumuman')}
+        />
+        <MenuCard
           icon="people-outline"
           title="Data Karyawan"
           subtitle="Divisi, jabatan, tanggal masuk, peran"

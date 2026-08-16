@@ -48,6 +48,7 @@ function RootNavigator() {
           <Stack.Screen name="cuti-form" options={{ headerShown: true, title: 'Ajukan Cuti / Izin' }} />
           <Stack.Screen name="kalender" options={{ headerShown: true, title: 'Kalender Libur' }} />
           <Stack.Screen name="gaji" options={{ headerShown: true, title: 'Gaji & Slip' }} />
+          <Stack.Screen name="pengumuman" options={{ headerShown: true, title: 'Pengumuman' }} />
           <Stack.Screen name="admin/index" options={{ headerShown: true, title: 'Panel Admin' }} />
           <Stack.Screen name="admin/approve" options={{ headerShown: true, title: 'Persetujuan Cuti' }} />
           <Stack.Screen name="admin/divisi" options={{ headerShown: true, title: 'Kelola Divisi' }} />
@@ -57,6 +58,7 @@ function RootNavigator() {
           <Stack.Screen name="admin/rekap" options={{ headerShown: true, title: 'Rekap Absensi' }} />
           <Stack.Screen name="admin/gaji" options={{ headerShown: true, title: 'Kelola Gaji' }} />
           <Stack.Screen name="admin/payroll" options={{ headerShown: true, title: 'Payroll' }} />
+          <Stack.Screen name="admin/pengumuman" options={{ headerShown: true, title: 'Kirim Pengumuman' }} />
         </Stack.Protected>
         <Stack.Protected guard={!isAuthenticated}>
           <Stack.Screen name="login" />

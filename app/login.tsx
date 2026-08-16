@@ -15,6 +15,7 @@ import { StatusBar } from 'expo-status-bar';
 import { colors, font, fontFamily, radius, spacing, typography } from '@/theme';
 import { useAuth, authErrorMessage, isEmailNotVerifiedError } from '@/store/auth';
 import FormField from '@/components/FormField';
+import BrandMark from '@/components/BrandMark';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -71,9 +72,7 @@ export default function LoginScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.brand}>
-          <View style={styles.brandIcon}>
-            <Ionicons name="checkmark" size={32} color={colors.bone} />
-          </View>
+          <BrandMark size={72} />
           <Text style={styles.brandTitle}>Absen Kilat</Text>
           <Text style={styles.brandSubtitle}>
             Catat kehadiranmu dengan cepat, aman, dan mudah
@@ -170,15 +169,6 @@ const styles = StyleSheet.create({
   brand: {
     alignItems: 'center',
     gap: spacing.sm,
-  },
-  brandIcon: {
-    width: 64,
-    height: 64,
-    borderRadius: radius.full,
-    backgroundColor: colors.redBrand,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.sm,
   },
   brandTitle: {
     ...typography.d2,
