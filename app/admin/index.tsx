@@ -38,6 +38,21 @@ export default function AdminScreen() {
           onPress={() => router.push('/admin/libur')}
         />
       </View>
+      <View style={styles.section}>
+        <Text style={styles.sectionLabel}>Keuangan</Text>
+        <MenuCard
+          icon="cash-outline"
+          title="Payroll"
+          subtitle="Hitung, simpan & rekap gaji bulanan"
+          onPress={() => router.push('/admin/payroll')}
+        />
+        <MenuCard
+          icon="card-outline"
+          title="Kelola Gaji"
+          subtitle="Gaji pokok, tunjangan, NPWP & BPJS karyawan"
+          onPress={() => router.push('/admin/gaji')}
+        />
+      </View>
     </ScrollView>
   );
 }

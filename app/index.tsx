@@ -109,6 +109,13 @@ export default function HomeScreen() {
             subtitle="Hari libur nasional, libur bersama & perusahaan"
             onPress={() => router.push('/kalender')}
           />
+          <MenuCard
+            icon="wallet-outline"
+            iconColor={colors.ink}
+            title="Gaji & Slip"
+            subtitle="Slip gaji bulanan dan unduh PDF"
+            onPress={() => router.push('/gaji')}
+          />
           {user?.role === 'admin' && (
             <MenuCard
               icon="shield-checkmark-outline"
