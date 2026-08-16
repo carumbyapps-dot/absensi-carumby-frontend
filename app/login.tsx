@@ -138,16 +138,9 @@ export default function LoginScreen() {
           </Pressable>
 
           <View style={styles.links}>
-            <Link href="/reset" asChild>
-              <Pressable style={({ pressed }) => [styles.link, pressed && styles.pressed]}>
-                <Text style={styles.linkText}>Lupa kata sandi?</Text>
-              </Pressable>
-            </Link>
-            <Link href="/register" asChild>
-              <Pressable style={({ pressed }) => [styles.link, pressed && styles.pressed]}>
-                <Text style={styles.linkText}>Belum punya akun? Daftar</Text>
-              </Pressable>
-            </Link>
+            <Text style={styles.linkNote}>
+              Akun dibuat admin & lupa kata sandi ditangani HRD — hubungi HRD bila butuh bantuan.
+            </Text>
           </View>
         </View>
       </ScrollView>
@@ -239,10 +232,13 @@ const styles = StyleSheet.create({
     color: colors.bone,
   },
   links: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    gap: spacing.md,
+  },
+  linkNote: {
+    fontFamily: fontFamily.regular,
+    fontSize: font.caption,
+    color: colors.ink60,
+    textAlign: 'center',
   },
   link: {
     paddingVertical: spacing.xs,

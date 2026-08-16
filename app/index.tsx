@@ -141,6 +141,13 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Menu</Text>
           <MenuCard
+            icon="person-outline"
+            iconColor={colors.ink}
+            title="Profil Saya"
+            subtitle="Foto profil, pengaturan & logout"
+            onPress={() => router.push('/profil')}
+          />
+          <MenuCard
             icon="calendar-outline"
             iconColor={colors.ink}
             title="Riwayat Absen"
@@ -244,6 +251,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.lg,
   },
   headerLeft: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: spacing.md,

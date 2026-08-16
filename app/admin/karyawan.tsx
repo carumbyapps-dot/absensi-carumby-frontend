@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -36,6 +37,14 @@ export default function AdminKaryawanScreen() {
   const [birthDate, setBirthDate] = useState('');
   const [importVisible, setImportVisible] = useState(false);
   const [importBusy, setImportBusy] = useState(false);
+  const [createVisible, setCreateVisible] = useState(false);
+  const [createBusy, setCreateBusy] = useState(false);
+  const [createName, setCreateName] = useState('');
+  const [createEmail, setCreateEmail] = useState('');
+  const [createPassword, setCreatePassword] = useState('');
+  const [resetUserId, setResetUserId] = useState<string | null>(null);
+  const [resetPassword, setResetPassword] = useState('');
+  const [resetBusy, setResetBusy] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -120,9 +129,58 @@ export default function AdminKaryawanScreen() {
     }
   };
 
+  const doCreate = async () => {
+    if (!createName.trim() || !/^\S+@\S+\.\S+$/.test(createEmail.trim()) || createPassword.length < 8) {
+      Alert.alert('Data tidak valid', 'Nama, email valid, dan kata sandi (min. 8 karakter) wajib diisi.');
+      return;
+    }
+    setCreateBusy(true);
+    try {
+      const r = await apiFetch<{ message: string }>('/api/employees/accounts', {
+        method: 'POST',
+        body: { name: createName.trim(), email: createEmail.trim(), password: createPassword },
+      });
+      Alert.alert('Akun dibuat', `${r.message}\n\nBagikan email & kata sandi ini ke karyawan (mis. via WhatsApp).`);
+      setCreateVisible(false);
+      setCreateName('');
+      setCreateEmail('');
+      setCreatePassword('');
+      await load();
+    } catch (err) {
+      Alert.alert('Gagal membuat akun', getErrorMessage(err));
+    } finally {
+      setCreateBusy(false);
+    }
+  };
+
+  const doResetPassword = async () => {
+    if (!resetUserId || resetPassword.length < 8) {
+      Alert.alert('Kata sandi baru wajib', 'Minimal 8 karakter.');
+      return;
+    }
+    setResetBusy(true);
+    try {
+      const r = await apiFetch<{ message: string }>(`/api/employees/${resetUserId}/reset-password`, {
+        method: 'POST',
+        body: { newPassword: resetPassword },
+      });
+      Alert.alert('Selesai', r.message);
+      setResetUserId(null);
+      setResetPassword('');
+    } catch (err) {
+      Alert.alert('Gagal mereset', getErrorMessage(err));
+    } finally {
+      setResetBusy(false);
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
       <View style={styles.ioRow}>
+        <Pressable style={({ pressed }) => [styles.createBtn, pressed && styles.pressed]} onPress={() => setCreateVisible(true)}>
+          <Ionicons name="person-add-outline" size={14} color={colors.bone} />
+          <Text style={styles.createBtnText}>Tambah Karyawan</Text>
+        </Pressable>
         <Pressable style={({ pressed }) => [styles.ioBtn, pressed && styles.pressed]} onPress={() => setImportVisible(true)}>
           <Ionicons name="download-outline" size={14} color={colors.ink} />
           <Text style={styles.ioBtnText}>Import CSV</Text>
@@ -259,6 +317,15 @@ export default function AdminKaryawanScreen() {
                       <Text style={styles.saveBtnText}>Simpan</Text>
                     )}
                   </Pressable>
+                  <Pressable
+                    style={({ pressed }) => [styles.resetBtn, pressed && styles.pressed]}
+                    onPress={() => {
+                      setResetUserId(emp.userId);
+                      setResetPassword('');
+                    }}
+                  >
+                    <Text style={styles.resetBtnText}>Reset Kata Sandi</Text>
+                  </Pressable>
                 </View>
               )}
             </View>
@@ -266,10 +333,77 @@ export default function AdminKaryawanScreen() {
         })
       )}
 
+      <Modal visible={createVisible} transparent animationType="fade" onRequestClose={() => setCreateVisible(false)}>
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalSheet}>
+            <Text style={styles.modalTitle}>Tambah Karyawan</Text>
+            <Text style={styles.modalHint}>
+              Akun dibuat oleh admin — kata sandi diserahkan langsung ke karyawan (mis. via WhatsApp).
+            </Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Nama lengkap"
+              placeholderTextColor={colors.ink38}
+              value={createName}
+              onChangeText={setCreateName}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              placeholderTextColor={colors.ink38}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              value={createEmail}
+              onChangeText={setCreateEmail}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Kata sandi (min. 8 karakter)"
+              placeholderTextColor={colors.ink38}
+              secureTextEntry
+              value={createPassword}
+              onChangeText={setCreatePassword}
+            />
+            <View style={styles.modalActions}>
+              <Pressable style={({ pressed }) => [styles.modalCancel, pressed && styles.pressed]} onPress={() => setCreateVisible(false)} disabled={createBusy}>
+                <Text style={styles.modalCancelText}>Batal</Text>
+              </Pressable>
+              <Pressable style={({ pressed }) => [styles.modalSubmit, pressed && styles.pressed]} onPress={doCreate} disabled={createBusy}>
+                {createBusy ? <ActivityIndicator color={colors.bone} size="small" /> : <Text style={styles.modalSubmitText}>Buat Akun</Text>}
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal visible={!!resetUserId} transparent animationType="fade" onRequestClose={() => setResetUserId(null)}>
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalSheet}>
+            <Text style={styles.modalTitle}>Reset Kata Sandi</Text>
+            <Text style={styles.modalHint}>Semua sesi login karyawan akan dicabut. Berikan kata sandi baru ke karyawan.</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Kata sandi baru (min. 8 karakter)"
+              placeholderTextColor={colors.ink38}
+              secureTextEntry
+              value={resetPassword}
+              onChangeText={setResetPassword}
+            />
+            <View style={styles.modalActions}>
+              <Pressable style={({ pressed }) => [styles.modalCancel, pressed && styles.pressed]} onPress={() => setResetUserId(null)} disabled={resetBusy}>
+                <Text style={styles.modalCancelText}>Batal</Text>
+              </Pressable>
+              <Pressable style={({ pressed }) => [styles.modalSubmit, pressed && styles.pressed]} onPress={doResetPassword} disabled={resetBusy}>
+                {resetBusy ? <ActivityIndicator color={colors.bone} size="small" /> : <Text style={styles.modalSubmitText}>Atur Ulang</Text>}
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       <CsvImportModal
         visible={importVisible}
-        title="Import Data Karyawan"
-        hint="Kolom: nama,email,peran,divisi,jabatan,tanggal_masuk,status,nik,telepon,alamat,jenis_kelamin,tanggal_lahir. Dicocokkan dengan EMAIL yang sudah terdaftar — tidak membuat akun baru."
+        title="Import Data Karyawan"        hint="Kolom: nama,email,peran,divisi,jabatan,tanggal_masuk,status,nik,telepon,alamat,jenis_kelamin,tanggal_lahir. Dicocokkan dengan EMAIL yang sudah terdaftar — tidak membuat akun baru."
         placeholder={'nama,email,peran,divisi,jabatan,tanggal_masuk,status,nik,telepon,alamat,jenis_kelamin,tanggal_lahir\nBudi Santoso,budi@carumby.id,employee,Gudang,Staff Gudang,2026-01-05,active,3210987654321098,08123456789,"Jl. Raya Sumedang No. 1",Laki-laki,1998-04-12'}
         template={{
           filename: 'template-data-karyawan.csv',
@@ -313,6 +447,82 @@ const styles = StyleSheet.create({
     ...typography.label,
     fontSize: 10,
     color: colors.ink,
+  },
+  createBtn: {
+    flex: 1.4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
+    backgroundColor: colors.red,
+    paddingVertical: spacing.sm,
+  },
+  createBtnText: {
+    ...typography.label,
+    fontSize: 10,
+    color: colors.bone,
+  },
+  resetBtn: {
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.ink,
+    paddingVertical: spacing.md,
+    marginTop: spacing.xs,
+  },
+  resetBtnText: {
+    ...typography.label,
+    fontSize: 10,
+    color: colors.ink,
+  },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: colors.ink90,
+    justifyContent: 'center',
+    padding: spacing.lg,
+  },
+  modalSheet: {
+    backgroundColor: colors.bone,
+    borderWidth: 1,
+    borderColor: colors.ink,
+    padding: spacing.lg,
+    gap: spacing.md,
+  },
+  modalTitle: {
+    ...typography.label,
+    fontSize: 13,
+    color: colors.ink,
+  },
+  modalHint: {
+    fontFamily: fontFamily.regular,
+    fontSize: font.caption,
+    color: colors.ink60,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    gap: spacing.md,
+  },
+  modalCancel: {
+    flex: 1,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.ink,
+    paddingVertical: spacing.md,
+  },
+  modalCancelText: {
+    ...typography.label,
+    fontSize: 11,
+    color: colors.ink,
+  },
+  modalSubmit: {
+    flex: 2,
+    alignItems: 'center',
+    backgroundColor: colors.red,
+    paddingVertical: spacing.md,
+  },
+  modalSubmitText: {
+    ...typography.label,
+    fontSize: 11,
+    color: colors.bone,
   },
   stateBox: {
     alignItems: 'center',

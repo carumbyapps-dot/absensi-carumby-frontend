@@ -63,7 +63,6 @@ function RootNavigator() {
         </Stack.Protected>
         <Stack.Protected guard={!isAuthenticated}>
           <Stack.Screen name="login" />
-          <Stack.Screen name="register" options={{ headerShown: true, title: 'Daftar Akun' }} />
           <Stack.Screen name="reset" options={{ headerShown: true, title: 'Atur Ulang Kata Sandi' }} />
         </Stack.Protected>
       </Stack>
