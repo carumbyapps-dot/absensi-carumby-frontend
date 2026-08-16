@@ -8,6 +8,7 @@ export interface AuthUser {
   emailVerified: boolean;
   avatarUrl: string | null;
   notificationPrefs: Record<string, unknown>;
+  role: 'admin' | 'employee';
 }
 
 export type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated';
@@ -20,6 +21,7 @@ interface SignInPayload {
     emailVerified: boolean;
     image?: string | null;
     notificationPrefs?: string | null;
+    role?: string | null;
   };
   token: string;
   redirect: boolean;
@@ -34,6 +36,7 @@ interface GetSessionPayload {
     emailVerified: boolean;
     image?: string | null;
     notificationPrefs?: string | null;
+    role?: string | null;
   };
   session: { token: string };
 }
@@ -50,6 +53,7 @@ function normalizeUser(raw: {
   image?: string | null;
   avatarUrl?: string | null;
   notificationPrefs?: string | null | Record<string, unknown>;
+  role?: string | null;
 }): AuthUser {
   const prefs = raw.notificationPrefs;
   return {
@@ -60,6 +64,7 @@ function normalizeUser(raw: {
     avatarUrl: raw.avatarUrl ?? (raw.image ? `${API_URL}${raw.image}` : null),
     notificationPrefs:
       typeof prefs === 'string' ? safeParsePrefs(prefs) : prefs ?? {},
+    role: raw.role === 'admin' ? 'admin' : 'employee',
   };
 }
 

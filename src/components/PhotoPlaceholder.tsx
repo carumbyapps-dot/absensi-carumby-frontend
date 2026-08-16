@@ -1,6 +1,6 @@
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, font, radius, spacing } from '@/theme';
+import { colors, fontFamily, font, spacing, typography } from '@/theme';
 
 interface Props {
   uri?: string | null;
@@ -19,10 +19,10 @@ export default function PhotoPlaceholder({ uri, height = 240, label = 'Foto self
   return (
     <View style={[styles.wrap, { height }, styles.empty]}>
       <View style={styles.iconWrap}>
-        <Ionicons name="person" size={40} color={colors.textMuted} />
+        <Ionicons name="person" size={32} color={colors.ink38} />
       </View>
       <Text style={styles.label}>{label}</Text>
-      <Text style={styles.hint}>Foto diambil saat absen</Text>
+      <Text style={styles.hint}>Foto diambil saat absen (data tiruan)</Text>
     </View>
   );
 }
@@ -30,11 +30,9 @@ export default function PhotoPlaceholder({ uri, height = 240, label = 'Foto self
 const styles = StyleSheet.create({
   wrap: {
     width: '100%',
-    borderRadius: radius.lg,
-    overflow: 'hidden',
-    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.ink12,
+    backgroundColor: colors.bone,
   },
   image: {
     width: '100%',
@@ -44,24 +42,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    backgroundColor: '#E9ECF5',
     borderStyle: 'dashed',
   },
   iconWrap: {
-    width: 72,
-    height: 72,
-    borderRadius: radius.full,
-    backgroundColor: colors.surface,
+    width: 56,
+    height: 56,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.ink12,
     alignItems: 'center',
     justifyContent: 'center',
   },
   label: {
-    fontSize: font.body,
-    fontWeight: '700',
-    color: colors.textSecondary,
+    ...typography.label,
+    color: colors.ink60,
+    fontSize: 10,
   },
   hint: {
-    fontSize: font.caption,
-    color: colors.textMuted,
+    fontFamily: fontFamily.regular,
+    fontSize: font.tiny,
+    color: colors.ink38,
   },
 });

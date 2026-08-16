@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Platform } from 'react-native';
-import { colors, font, radius, spacing } from '@/theme';
+import { colors, font, fontFamily, numerals, spacing, typography } from '@/theme';
 import { useRecordsForDate } from '@/store/attendance';
 import AttendanceRow from '@/components/AttendanceRow';
 
@@ -82,16 +81,14 @@ export default function RiwayatScreen() {
           style={({ pressed }) => [styles.calendarButton, pressed && styles.pressed]}
           onPress={() => setShowPicker(true)}
         >
-          <Ionicons name="calendar" size={20} color={colors.primary} />
+          <Ionicons name="calendar-outline" size={20} color={colors.ink} />
         </Pressable>
       </View>
 
       <View style={styles.labelRow}>
-        <Text style={styles.dateLabel}>{formatLabel(selectedDate)}</Text>
+        <Text style={styles.dateLabel}>{formatLabel(selectedDate).toUpperCase()}</Text>
         {records && records.length > 0 && (
-          <Text style={styles.countLabel}>
-            {records.length} catatan
-          </Text>
+          <Text style={styles.countLabel}>{records.length} catatan</Text>
         )}
       </View>
 
@@ -120,18 +117,18 @@ export default function RiwayatScreen() {
           <RefreshControl
             refreshing={loading && records === null}
             onRefresh={() => reload()}
-            tintColor={colors.primary}
+            tintColor={colors.ink}
           />
         }
       >
         {loading && records === null ? (
           <View style={styles.stateBox}>
-            <ActivityIndicator color={colors.primary} />
+            <ActivityIndicator color={colors.ink} />
             <Text style={styles.stateText}>Memuat data absen…</Text>
           </View>
         ) : error ? (
           <View style={styles.stateBox}>
-            <Ionicons name="cloud-offline-outline" size={28} color={colors.textMuted} />
+            <Ionicons name="cloud-offline-outline" size={28} color={colors.ink38} />
             <Text style={styles.stateText}>{error}</Text>
             <Pressable onPress={() => reload()}>
               <Text style={styles.retryText}>Coba lagi</Text>
@@ -142,14 +139,14 @@ export default function RiwayatScreen() {
             <Ionicons
               name={isToday ? 'calendar-clear-outline' : 'folder-open-outline'}
               size={28}
-              color={colors.textMuted}
+              color={colors.ink38}
             />
             <Text style={styles.stateText}>
               {isToday ? 'Belum ada absen hari ini' : 'Tidak ada catatan absen di tanggal ini'}
             </Text>
           </View>
         ) : (
-          <View style={styles.list}>
+          <View>
             {records.map((record) => (
               <AttendanceRow key={record.id} record={record} />
             ))}
@@ -163,7 +160,7 @@ export default function RiwayatScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.bone,
   },
   stripRow: {
     flexDirection: 'row',
@@ -181,36 +178,34 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 2,
     paddingVertical: spacing.md,
-    borderRadius: radius.lg,
-    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.ink12,
+    backgroundColor: colors.bone,
   },
   dayChipSelected: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    backgroundColor: colors.ink,
+    borderColor: colors.ink,
   },
   dayAbbr: {
-    fontSize: font.tiny,
-    fontWeight: '700',
-    color: colors.textMuted,
-    textTransform: 'uppercase',
+    ...typography.label,
+    fontSize: 9,
+    letterSpacing: 0.8,
+    color: colors.ink60,
   },
   dayNum: {
+    ...numerals,
+    fontFamily: fontFamily.bold,
     fontSize: font.body,
-    fontWeight: '800',
-    color: colors.text,
+    color: colors.ink,
   },
   dayTextSelected: {
-    color: colors.white,
+    color: colors.bone,
   },
   calendarButton: {
     width: 48,
     height: 48,
-    borderRadius: radius.lg,
-    backgroundColor: colors.primaryLight,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.ink12,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -226,13 +221,16 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.md,
   },
   dateLabel: {
-    fontSize: font.heading,
-    fontWeight: '800',
-    color: colors.text,
+    ...typography.d3,
+    fontSize: 14,
+    letterSpacing: 0.8,
+    color: colors.ink,
+    flex: 1,
   },
   countLabel: {
+    fontFamily: fontFamily.semibold,
     fontSize: font.caption,
-    color: colors.textSecondary,
+    color: colors.ink60,
   },
   pickerWrap: {
     paddingHorizontal: spacing.lg,
@@ -243,33 +241,29 @@ const styles = StyleSheet.create({
     padding: spacing.md,
   },
   pickerDoneText: {
-    fontSize: font.body,
-    fontWeight: '800',
-    color: colors.primary,
+    ...typography.label,
+    color: colors.red,
   },
   listContent: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xxl,
   },
-  list: {
-    gap: spacing.md,
-  },
   stateBox: {
     alignItems: 'center',
     gap: spacing.md,
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderStyle: 'dashed',
+    borderColor: colors.ink38,
     paddingVertical: spacing.xxl,
   },
   stateText: {
-    fontSize: font.label,
-    color: colors.textSecondary,
+    fontFamily: fontFamily.regular,
+    fontSize: font.caption,
+    color: colors.ink60,
+    textAlign: 'center',
   },
   retryText: {
-    fontSize: font.label,
-    fontWeight: '700',
-    color: colors.primary,
+    ...typography.label,
+    color: colors.red,
   },
 });

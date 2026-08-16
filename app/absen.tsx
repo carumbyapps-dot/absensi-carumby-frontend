@@ -13,7 +13,7 @@ import * as Location from 'expo-location';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, font, radius, spacing } from '@/theme';
+import { colors, font, fontFamily, numerals, spacing, typography } from '@/theme';
 import { useAttendance } from '@/store/attendance';
 import { useNow, formatClock } from '@/hooks/useNow';
 import { getErrorMessage } from '@/lib/api';
@@ -133,8 +133,8 @@ export default function AbsenScreen() {
           />
         ) : (
           <View style={[styles.cameraFallback, { paddingTop: insets.top }]}>
-            <Ionicons name="camera-outline" size={48} color={colors.white} />
-            <Text style={styles.cameraFallbackTitle}>Kamera diperlukan</Text>
+            <Ionicons name="camera-outline" size={40} color={colors.bone} />
+            <Text style={styles.cameraFallbackTitle}>Kamera Diperlukan</Text>
             <Text style={styles.cameraFallbackText}>
               Izinkan akses kamera untuk mengambil foto selfie sebagai bukti kehadiran.
             </Text>
@@ -151,10 +151,10 @@ export default function AbsenScreen() {
           style={[styles.closeButton, { top: insets.top + spacing.md }]}
           onPress={() => router.back()}
         >
-          <Ionicons name="close" size={26} color={colors.white} />
+          <Ionicons name="close" size={22} color={colors.bone} />
         </Pressable>
 
-        <View style={[styles.cameraTopLabel, { top: insets.top + spacing.md + 52 }]}>
+        <View style={[styles.cameraTopLabel, { top: insets.top + spacing.md + 48 }]}>
           <Text style={styles.cameraTopLabelText}>{modeLabel}</Text>
         </View>
 
@@ -177,10 +177,10 @@ export default function AbsenScreen() {
     return (
       <View style={[styles.container, styles.center, { paddingTop: insets.top }]}>
         <View style={styles.successIcon}>
-          <Ionicons name="checkmark" size={44} color={colors.white} />
+          <Ionicons name="checkmark" size={40} color={colors.bone} />
         </View>
         <Text style={styles.successTitle}>
-          {savedRecord.type === 'in' ? 'Absen Masuk berhasil' : 'Absen Keluar berhasil'}
+          {savedRecord.type === 'in' ? 'Absen Masuk Berhasil' : 'Absen Keluar Berhasil'}
         </Text>
         <Text style={styles.successSubtitle}>
           {savedRecord.type === 'in' ? 'Masuk' : 'Keluar'} pukul{' '}
@@ -200,7 +200,7 @@ export default function AbsenScreen() {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.confirmHeader}>
         <Pressable onPress={() => router.back()} style={styles.confirmBack}>
-          <Ionicons name="chevron-back" size={24} color={colors.text} />
+          <Ionicons name="arrow-back" size={22} color={colors.ink} />
         </Pressable>
         <Text style={styles.confirmTitle}>Konfirmasi {modeLabel}</Text>
         <View style={styles.confirmBack} />
@@ -213,10 +213,10 @@ export default function AbsenScreen() {
           </View>
         )}
 
-        <View style={styles.card}>
-          <View style={styles.cardRow}>
-            <Ionicons name="location" size={18} color={colors.primary} />
-            <Text style={styles.cardLabel}>Lokasi GPS</Text>
+        <View style={styles.block}>
+          <View style={styles.blockRow}>
+            <Ionicons name="location" size={16} color={colors.ink} />
+            <Text style={styles.blockLabel}>Lokasi GPS</Text>
           </View>
 
           {locationState === 'ok' && location ? (
@@ -232,17 +232,15 @@ export default function AbsenScreen() {
             </>
           ) : locationState === 'loading' ? (
             <View style={styles.locationBox}>
-              <ActivityIndicator color={colors.primary} />
+              <ActivityIndicator color={colors.ink} />
               <Text style={styles.locationText}>Mendeteksi lokasi…</Text>
             </View>
           ) : (
             <View style={styles.locationBox}>
               <Ionicons
-                name={
-                  locationState === 'denied' ? 'lock-closed-outline' : 'alert-circle-outline'
-                }
-                size={22}
-                color={colors.warning}
+                name={locationState === 'denied' ? 'lock-closed-outline' : 'alert-circle-outline'}
+                size={20}
+                color={colors.ink38}
               />
               <Text style={styles.locationText}>
                 {locationState === 'denied'
@@ -256,17 +254,17 @@ export default function AbsenScreen() {
           )}
         </View>
 
-        <View style={styles.card}>
-          <View style={styles.cardRow}>
-            <Ionicons name="time-outline" size={18} color={colors.primary} />
-            <Text style={styles.cardLabel}>Waktu dicatat</Text>
+        <View style={styles.block}>
+          <View style={styles.blockRow}>
+            <Ionicons name="time-outline" size={16} color={colors.ink} />
+            <Text style={styles.blockLabel}>Waktu Dicatat</Text>
           </View>
           <Text style={styles.timeText}>{formatClock(now)}</Text>
         </View>
 
         {submitError && (
           <View style={styles.errorBox}>
-            <Ionicons name="alert-circle-outline" size={18} color={colors.danger} />
+            <Ionicons name="alert-circle-outline" size={16} color={colors.red} />
             <Text style={styles.errorText}>{submitError}</Text>
           </View>
         )}
@@ -280,7 +278,7 @@ export default function AbsenScreen() {
             }}
             disabled={submitting}
           >
-            <Ionicons name="refresh" size={18} color={colors.textSecondary} />
+            <Ionicons name="refresh" size={16} color={colors.ink} />
             <Text style={styles.secondaryButtonText}>Ulangi</Text>
           </Pressable>
 
@@ -290,9 +288,9 @@ export default function AbsenScreen() {
             disabled={submitting}
           >
             {submitting ? (
-              <ActivityIndicator color={colors.white} />
+              <ActivityIndicator color={colors.bone} />
             ) : (
-              <Ionicons name="send" size={18} color={colors.white} />
+              <Ionicons name="arrow-forward" size={16} color={colors.bone} />
             )}
             <Text style={styles.primaryButtonText}>{submitting ? 'Mengirim…' : 'Kirim'}</Text>
           </Pressable>
@@ -305,7 +303,7 @@ export default function AbsenScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.bone,
   },
   center: {
     alignItems: 'center',
@@ -314,11 +312,11 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   pressed: {
-    opacity: 0.7,
+    opacity: 0.6,
   },
   cameraContainer: {
     flex: 1,
-    backgroundColor: '#0B0F19',
+    backgroundColor: colors.ink,
   },
   cameraFallback: {
     flex: 1,
@@ -328,34 +326,32 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xl,
   },
   cameraFallbackTitle: {
-    fontSize: font.heading,
-    fontWeight: '800',
-    color: colors.white,
+    ...typography.d3,
+    color: colors.bone,
   },
   cameraFallbackText: {
+    fontFamily: fontFamily.regular,
     fontSize: font.body,
-    color: '#CBD5E1',
+    color: colors.bone55,
     textAlign: 'center',
   },
   permissionButton: {
-    backgroundColor: colors.white,
-    borderRadius: radius.lg,
+    backgroundColor: colors.red,
     paddingHorizontal: spacing.xl,
     paddingVertical: spacing.md,
     marginTop: spacing.sm,
   },
   permissionButtonText: {
-    fontSize: font.body,
-    fontWeight: '800',
-    color: colors.primaryDark,
+    ...typography.label,
+    color: colors.bone,
   },
   closeButton: {
     position: 'absolute',
     left: spacing.lg,
     width: 40,
     height: 40,
-    borderRadius: radius.full,
-    backgroundColor: 'rgba(0,0,0,0.45)',
+    borderWidth: 1,
+    borderColor: colors.bone16,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -366,9 +362,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cameraTopLabelText: {
-    fontSize: font.body,
-    fontWeight: '800',
-    color: colors.white,
+    ...typography.label,
+    color: colors.bone,
   },
   cameraBottom: {
     position: 'absolute',
@@ -379,17 +374,18 @@ const styles = StyleSheet.create({
     gap: spacing.lg,
   },
   cameraClock: {
-    fontSize: font.title,
-    fontWeight: '800',
-    color: colors.white,
-    fontVariant: ['tabular-nums'],
+    ...numerals,
+    fontFamily: fontFamily.black,
+    fontSize: font.d2,
+    color: colors.bone,
+    letterSpacing: 0.4,
   },
   shutter: {
-    width: 76,
-    height: 76,
-    borderRadius: radius.full,
-    borderWidth: 4,
-    borderColor: colors.white,
+    width: 72,
+    height: 72,
+    borderRadius: 999,
+    borderWidth: 3,
+    borderColor: colors.bone,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -398,14 +394,15 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.95 }],
   },
   shutterInner: {
-    width: 60,
-    height: 60,
-    borderRadius: radius.full,
-    backgroundColor: colors.white,
+    width: 56,
+    height: 56,
+    borderRadius: 999,
+    backgroundColor: colors.bone,
   },
   cameraHint: {
-    fontSize: font.caption,
-    color: '#CBD5E1',
+    fontFamily: fontFamily.regular,
+    fontSize: font.tiny,
+    color: colors.bone55,
   },
   confirmHeader: {
     flexDirection: 'row',
@@ -413,6 +410,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.ink12,
   },
   confirmBack: {
     width: 40,
@@ -421,46 +420,44 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   confirmTitle: {
-    fontSize: font.heading,
-    fontWeight: '800',
-    color: colors.text,
+    ...typography.d3,
+    fontSize: 16,
+    color: colors.ink,
   },
   confirmBody: {
     paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
     gap: spacing.lg,
     paddingBottom: spacing.xxl,
   },
   photoWrap: {
-    borderRadius: radius.lg,
-    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: colors.ink12,
   },
   photo: {
     width: '100%',
     aspectRatio: 3 / 4,
-    backgroundColor: '#E9ECF5',
+    backgroundColor: colors.ink12,
   },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
+  block: {
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.ink12,
     padding: spacing.lg,
     gap: spacing.md,
   },
-  cardRow: {
+  blockRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
   },
-  cardLabel: {
-    fontSize: font.label,
-    fontWeight: '700',
-    color: colors.text,
+  blockLabel: {
+    ...typography.label,
+    color: colors.ink,
   },
   coordsText: {
+    fontFamily: fontFamily.regular,
     fontSize: font.caption,
-    color: colors.textSecondary,
-    fontVariant: ['tabular-nums'],
+    color: colors.ink60,
   },
   locationBox: {
     alignItems: 'center',
@@ -468,35 +465,35 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
   },
   locationText: {
-    fontSize: font.label,
-    color: colors.textSecondary,
+    fontFamily: fontFamily.regular,
+    fontSize: font.caption,
+    color: colors.ink60,
     textAlign: 'center',
   },
   retryText: {
-    fontSize: font.label,
-    fontWeight: '700',
-    color: colors.primary,
+    ...typography.label,
+    color: colors.red,
   },
   timeText: {
-    fontSize: font.heading,
-    fontWeight: '800',
-    color: colors.text,
-    fontVariant: ['tabular-nums'],
+    ...numerals,
+    fontFamily: fontFamily.black,
+    fontSize: font.d2,
+    color: colors.ink,
+    letterSpacing: 0.4,
   },
   errorBox: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
-    backgroundColor: '#FEF2F2',
-    borderRadius: radius.lg,
     borderWidth: 1,
-    borderColor: '#FECACA',
+    borderColor: colors.red,
     padding: spacing.md,
   },
   errorText: {
     flex: 1,
-    fontSize: font.label,
-    color: colors.danger,
+    fontFamily: fontFamily.regular,
+    fontSize: font.caption,
+    color: colors.red,
   },
   actions: {
     flexDirection: 'row',
@@ -508,16 +505,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.lg,
+    borderColor: colors.ink,
     paddingVertical: spacing.lg,
   },
   secondaryButtonText: {
-    fontSize: font.body,
-    fontWeight: '700',
-    color: colors.textSecondary,
+    ...typography.label,
+    color: colors.ink,
   },
   primaryButton: {
     flex: 2,
@@ -525,44 +519,40 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    backgroundColor: colors.primary,
-    borderRadius: radius.lg,
+    backgroundColor: colors.red,
     paddingVertical: spacing.lg,
   },
   primaryButtonText: {
-    fontSize: font.body,
-    fontWeight: '800',
-    color: colors.white,
+    ...typography.label,
+    color: colors.bone,
   },
   successIcon: {
-    width: 88,
-    height: 88,
-    borderRadius: radius.full,
-    backgroundColor: colors.success,
+    width: 76,
+    height: 76,
+    backgroundColor: colors.lumut,
     alignItems: 'center',
     justifyContent: 'center',
   },
   successTitle: {
-    fontSize: font.title,
-    fontWeight: '800',
-    color: colors.text,
+    ...typography.d1,
+    fontSize: 22,
+    color: colors.ink,
     textAlign: 'center',
   },
   successSubtitle: {
+    fontFamily: fontFamily.regular,
     fontSize: font.body,
-    color: colors.textSecondary,
+    color: colors.ink60,
     textAlign: 'center',
   },
   successButton: {
-    backgroundColor: colors.primary,
-    borderRadius: radius.lg,
+    backgroundColor: colors.red,
     paddingHorizontal: spacing.xxl,
     paddingVertical: spacing.lg,
     marginTop: spacing.xl,
   },
   successButtonText: {
-    fontSize: font.body,
-    fontWeight: '800',
-    color: colors.white,
+    ...typography.label,
+    color: colors.bone,
   },
 });

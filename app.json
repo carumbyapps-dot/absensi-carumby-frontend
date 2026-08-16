@@ -48,7 +48,7 @@
           "cameraPermission": "Izinkan Absen Kilat menggunakan kamera untuk mengambil foto selfie sebagai bukti kehadiran."
         }
       ],
-[
+      [
         "expo-location",
         {
           "locationWhenInUsePermission": "Izinkan Absen Kilat menggunakan lokasi untuk mencatat koordinat GPS saat absen."
@@ -59,7 +59,8 @@
         {
           "photosPermission": "Izinkan Absen Kilat mengakses galeri untuk memilih foto profil."
         }
-      ]
+      ],
+      "expo-font"
     ]
   }
 }

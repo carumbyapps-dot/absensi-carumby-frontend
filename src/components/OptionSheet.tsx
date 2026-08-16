@@ -1,11 +1,10 @@
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, font, radius, spacing } from '@/theme';
+import { colors, fontFamily, font, spacing, typography } from '@/theme';
 
 export interface SheetOption {
   label: string;
   icon: keyof typeof Ionicons.glyphMap;
-  color?: string;
   destructive?: boolean;
   onPress: () => void;
 }
@@ -36,15 +35,10 @@ export default function OptionSheet({ visible, title, options, onClose }: Props)
             >
               <Ionicons
                 name={option.icon}
-                size={20}
-                color={option.destructive ? colors.danger : option.color ?? colors.primary}
+                size={18}
+                color={option.destructive ? colors.red : colors.ink}
               />
-              <Text
-                style={[
-                  styles.optionText,
-                  option.destructive && { color: colors.danger },
-                ]}
-              >
+              <Text style={[styles.optionText, option.destructive && { color: colors.red }]}>
                 {option.label}
               </Text>
             </Pressable>
@@ -64,21 +58,20 @@ export default function OptionSheet({ visible, title, options, onClose }: Props)
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.45)',
+    backgroundColor: colors.ink90,
     justifyContent: 'flex-end',
   },
   sheet: {
-    backgroundColor: colors.surface,
-    borderTopLeftRadius: radius.xl,
-    borderTopRightRadius: radius.xl,
+    backgroundColor: colors.bone,
+    borderTopWidth: 1,
+    borderTopColor: colors.ink12,
     padding: spacing.lg,
     paddingBottom: spacing.xxl,
     gap: spacing.sm,
   },
   title: {
-    fontSize: font.label,
-    fontWeight: '700',
-    color: colors.textMuted,
+    ...typography.label,
+    color: colors.ink60,
     textAlign: 'center',
     marginBottom: spacing.sm,
   },
@@ -88,16 +81,16 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     paddingVertical: spacing.lg,
     paddingHorizontal: spacing.md,
-    borderRadius: radius.lg,
-    backgroundColor: colors.background,
+    borderWidth: 1,
+    borderColor: colors.ink12,
   },
   pressed: {
-    opacity: 0.7,
+    opacity: 0.6,
   },
   optionText: {
-    fontSize: font.body,
-    fontWeight: '700',
-    color: colors.text,
+    ...typography.label,
+    color: colors.ink,
+    fontSize: 12,
   },
   cancel: {
     alignItems: 'center',
@@ -105,8 +98,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   cancelText: {
-    fontSize: font.body,
-    fontWeight: '800',
-    color: colors.primary,
+    ...typography.label,
+    color: colors.red,
   },
 });

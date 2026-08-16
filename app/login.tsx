@@ -12,7 +12,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { Link, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { colors, font, radius, spacing } from '@/theme';
+import { colors, font, fontFamily, radius, spacing, typography } from '@/theme';
 import { useAuth, authErrorMessage, isEmailNotVerifiedError } from '@/store/auth';
 import FormField from '@/components/FormField';
 
@@ -72,7 +72,7 @@ export default function LoginScreen() {
       >
         <View style={styles.brand}>
           <View style={styles.brandIcon}>
-            <Ionicons name="checkmark-circle" size={36} color={colors.white} />
+            <Ionicons name="checkmark" size={32} color={colors.bone} />
           </View>
           <Text style={styles.brandTitle}>Absen Kilat</Text>
           <Text style={styles.brandSubtitle}>
@@ -80,9 +80,9 @@ export default function LoginScreen() {
           </Text>
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Masuk</Text>
-          <Text style={styles.cardSubtitle}>Gunakan email dan kata sandi akun Anda.</Text>
+        <View style={styles.group}>
+          <Text style={styles.groupTitle}>Masuk</Text>
+          <Text style={styles.groupSubtitle}>Gunakan email dan kata sandi akun Anda.</Text>
 
           <FormField
             label="Email"
@@ -107,7 +107,7 @@ export default function LoginScreen() {
 
           {error && (
             <View style={styles.errorBox}>
-              <Ionicons name="alert-circle-outline" size={18} color={colors.danger} />
+              <Ionicons name="alert-circle-outline" size={18} color={colors.red} />
               <Text style={styles.errorText}>{error}</Text>
             </View>
           )}
@@ -118,7 +118,7 @@ export default function LoginScreen() {
               onPress={resend}
               disabled={submitting}
             >
-              <Ionicons name="mail-unread-outline" size={18} color={colors.primary} />
+              <Ionicons name="mail-unread-outline" size={18} color={colors.red} />
               <Text style={styles.resendText}>
                 {resent ? 'Email verifikasi terkirim ulang' : 'Kirim ulang email verifikasi'}
               </Text>
@@ -131,9 +131,9 @@ export default function LoginScreen() {
             disabled={submitting}
           >
             {submitting ? (
-              <ActivityIndicator color={colors.white} />
+              <ActivityIndicator color={colors.bone} />
             ) : (
-              <Ionicons name="log-in-outline" size={18} color={colors.white} />
+              <Ionicons name="log-in-outline" size={18} color={colors.bone} />
             )}
             <Text style={styles.primaryButtonText}>{submitting ? 'Memproses…' : 'Masuk'}</Text>
           </Pressable>
@@ -159,7 +159,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.bone,
   },
   content: {
     flexGrow: 1,
@@ -172,56 +172,55 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   brandIcon: {
-    width: 72,
-    height: 72,
-    borderRadius: radius.xl,
-    backgroundColor: colors.primary,
+    width: 64,
+    height: 64,
+    borderRadius: radius.full,
+    backgroundColor: colors.redBrand,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.sm,
   },
   brandTitle: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: colors.text,
+    ...typography.d2,
+    fontSize: 24,
+    color: colors.ink,
   },
   brandSubtitle: {
+    fontFamily: fontFamily.regular,
     fontSize: font.body,
-    color: colors.textSecondary,
+    color: colors.ink60,
     textAlign: 'center',
   },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.xl,
+  group: {
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.ink12,
     padding: spacing.xl,
     gap: spacing.lg,
   },
-  cardTitle: {
-    fontSize: font.title,
-    fontWeight: '800',
-    color: colors.text,
+  groupTitle: {
+    ...typography.d3,
+    fontSize: 18,
+    color: colors.ink,
   },
-  cardSubtitle: {
-    fontSize: font.label,
-    color: colors.textSecondary,
+  groupSubtitle: {
+    fontFamily: fontFamily.regular,
+    fontSize: font.caption,
+    color: colors.ink60,
     marginTop: -spacing.sm,
   },
   errorBox: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
-    backgroundColor: '#FEF2F2',
-    borderRadius: radius.lg,
     borderWidth: 1,
-    borderColor: '#FECACA',
+    borderColor: colors.red,
     padding: spacing.md,
   },
   errorText: {
     flex: 1,
-    fontSize: font.label,
-    color: colors.danger,
+    fontFamily: fontFamily.regular,
+    fontSize: font.caption,
+    color: colors.red,
   },
   resendButton: {
     flexDirection: 'row',
@@ -231,26 +230,23 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
   },
   resendText: {
-    fontSize: font.label,
-    fontWeight: '700',
-    color: colors.primary,
+    ...typography.label,
+    color: colors.red,
   },
   primaryButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    backgroundColor: colors.primary,
-    borderRadius: radius.lg,
+    backgroundColor: colors.red,
     paddingVertical: spacing.lg,
   },
   pressed: {
     opacity: 0.8,
   },
   primaryButtonText: {
-    fontSize: font.body,
-    fontWeight: '800',
-    color: colors.white,
+    ...typography.label,
+    color: colors.bone,
   },
   links: {
     flexDirection: 'row',
@@ -262,8 +258,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
   },
   linkText: {
-    fontSize: font.label,
-    fontWeight: '700',
-    color: colors.primary,
+    ...typography.label,
+    color: colors.red,
   },
 });

@@ -15,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { MediaType } from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import { colors, font, radius, spacing } from '@/theme';
+import { colors, font, fontFamily, radius, spacing, typography } from '@/theme';
 import { useAuth } from '@/store/auth';
 import { getErrorMessage } from '@/lib/api';
 import OptionSheet, { SheetOption } from '@/components/OptionSheet';
@@ -90,20 +90,20 @@ export default function ProfilScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <View style={styles.card}>
+      <View style={styles.identity}>
         <Pressable style={styles.avatarWrap} onPress={() => setSheet('avatar')}>
           {user?.avatarUrl ? (
             <Image source={{ uri: user.avatarUrl }} style={styles.avatar} />
           ) : (
-            <View style={[styles.avatar, styles.avatarPlaceholder]}>
-              <Ionicons name="person" size={40} color={colors.white} />
+            <View style={styles.avatar}>
+              <Ionicons name="person" size={32} color={colors.bone} />
             </View>
           )}
           <View style={styles.avatarBadge}>
             {uploading ? (
-              <ActivityIndicator size="small" color={colors.white} />
+              <ActivityIndicator size="small" color={colors.bone} />
             ) : (
-              <Ionicons name="camera" size={14} color={colors.white} />
+              <Ionicons name="camera" size={14} color={colors.bone} />
             )}
           </View>
         </Pressable>
@@ -114,17 +114,17 @@ export default function ProfilScreen() {
 
       <Text style={styles.sectionTitle}>Pengaturan</Text>
 
-      <View style={styles.card}>
+      <View style={styles.group}>
         <View style={styles.settingRow}>
           <View style={styles.settingIcon}>
-            <Ionicons name="notifications-outline" size={20} color={colors.primary} />
+            <Ionicons name="notifications-outline" size={18} color={colors.ink} />
           </View>
           <Text style={styles.settingLabel}>Notifikasi absen</Text>
           <Switch
             value={notifications}
             onValueChange={toggleNotifications}
-            trackColor={{ false: colors.border, true: colors.primary }}
-            thumbColor={colors.white}
+            trackColor={{ false: colors.ink38, true: colors.lumut }}
+            thumbColor={colors.bone}
           />
         </View>
 
@@ -133,10 +133,10 @@ export default function ProfilScreen() {
           onPress={() => setSheet('password')}
         >
           <View style={styles.settingIcon}>
-            <Ionicons name="key-outline" size={20} color={colors.primary} />
+            <Ionicons name="key-outline" size={18} color={colors.ink} />
           </View>
           <Text style={styles.settingLabel}>Ganti kata sandi</Text>
-          <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
+          <Ionicons name="chevron-forward" size={18} color={colors.ink38} />
         </Pressable>
       </View>
 
@@ -144,11 +144,11 @@ export default function ProfilScreen() {
         style={({ pressed }) => [styles.logoutButton, pressed && styles.pressed]}
         onPress={() => setSheet('logout')}
       >
-        <Ionicons name="log-out-outline" size={20} color={colors.danger} />
+        <Ionicons name="log-out-outline" size={18} color={colors.red} />
         <Text style={styles.logoutText}>Logout</Text>
       </Pressable>
 
-      <Text style={styles.footer}>Absen Kilat v1.0.0</Text>
+      <Text style={styles.footer}>ABSEN KILAT V1.0.0</Text>
 
       <OptionSheet
         visible={sheet === 'avatar'}
@@ -209,7 +209,7 @@ export default function ProfilScreen() {
               disabled={passwordBusy}
             >
               {passwordBusy ? (
-                <ActivityIndicator color={colors.white} />
+                <ActivityIndicator color={colors.bone} />
               ) : (
                 <Text style={styles.modalButtonText}>Simpan</Text>
               )}
@@ -227,18 +227,14 @@ export default function ProfilScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.bone,
   },
   content: {
     padding: spacing.lg,
     paddingBottom: spacing.xxl,
   },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.xl,
+  identity: {
+    paddingVertical: spacing.xl,
   },
   avatarWrap: {
     alignSelf: 'center',
@@ -247,9 +243,7 @@ const styles = StyleSheet.create({
     width: 88,
     height: 88,
     borderRadius: radius.full,
-    backgroundColor: colors.primary,
-  },
-  avatarPlaceholder: {
+    backgroundColor: colors.red,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -260,57 +254,65 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: radius.full,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.ink,
     borderWidth: 3,
-    borderColor: colors.surface,
+    borderColor: colors.bone,
     alignItems: 'center',
     justifyContent: 'center',
   },
   name: {
-    fontSize: font.heading,
-    fontWeight: '800',
-    color: colors.text,
+    ...typography.d2,
+    fontSize: 20,
+    color: colors.ink,
     textAlign: 'center',
     marginTop: spacing.md,
   },
   email: {
-    fontSize: font.label,
-    color: colors.textSecondary,
+    fontFamily: fontFamily.regular,
+    fontSize: font.caption,
+    color: colors.ink60,
     textAlign: 'center',
     marginTop: 2,
   },
   avatarHint: {
-    fontSize: font.caption,
-    color: colors.textMuted,
+    fontFamily: fontFamily.regular,
+    fontSize: font.tiny,
+    color: colors.ink38,
     textAlign: 'center',
     marginTop: spacing.sm,
   },
   sectionTitle: {
-    fontSize: font.body,
-    fontWeight: '800',
-    color: colors.text,
+    ...typography.label,
+    color: colors.ink,
     marginTop: spacing.xl,
     marginBottom: spacing.md,
+  },
+  group: {
+    borderWidth: 1,
+    borderColor: colors.ink12,
   },
   settingRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.ink12,
   },
   settingIcon: {
     width: 36,
     height: 36,
-    borderRadius: radius.sm,
-    backgroundColor: colors.primaryLight,
+    borderWidth: 1,
+    borderColor: colors.ink12,
     alignItems: 'center',
     justifyContent: 'center',
   },
   settingLabel: {
     flex: 1,
-    fontSize: font.body,
-    fontWeight: '700',
-    color: colors.text,
+    ...typography.label,
+    fontSize: 12,
+    color: colors.ink,
   },
   pressed: {
     opacity: 0.7,
@@ -320,79 +322,77 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
     borderWidth: 1,
-    borderColor: '#FECACA',
+    borderColor: colors.red,
     paddingVertical: spacing.lg,
     marginTop: spacing.xl,
   },
   logoutText: {
-    fontSize: font.body,
-    fontWeight: '800',
-    color: colors.danger,
+    ...typography.label,
+    color: colors.red,
   },
   footer: {
-    fontSize: font.caption,
-    color: colors.textMuted,
+    ...typography.label,
+    fontSize: 9,
+    letterSpacing: 1.4,
+    color: colors.ink38,
     textAlign: 'center',
     marginTop: spacing.xl,
   },
   modalBackdrop: {
     flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.45)',
+    backgroundColor: colors.ink90,
     justifyContent: 'center',
     padding: spacing.xl,
   },
   modalCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.xl,
+    backgroundColor: colors.bone,
+    borderWidth: 1,
+    borderColor: colors.ink12,
     padding: spacing.xl,
     gap: spacing.md,
   },
   modalTitle: {
-    fontSize: font.heading,
-    fontWeight: '800',
-    color: colors.text,
+    ...typography.d3,
+    fontSize: 16,
+    color: colors.ink,
   },
   input: {
-    backgroundColor: colors.background,
+    backgroundColor: colors.bone,
     borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.md,
+    borderColor: colors.ink12,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
+    fontFamily: fontFamily.regular,
     fontSize: font.body,
-    color: colors.text,
+    color: colors.ink,
   },
   modalError: {
-    fontSize: font.label,
-    color: colors.danger,
+    ...typography.label,
+    fontSize: 10,
+    color: colors.red,
   },
   modalSuccess: {
-    fontSize: font.label,
-    color: colors.success,
-    fontWeight: '700',
+    ...typography.label,
+    fontSize: 10,
+    color: colors.lumut,
   },
   modalButton: {
-    backgroundColor: colors.primary,
-    borderRadius: radius.lg,
+    backgroundColor: colors.red,
     paddingVertical: spacing.lg,
     alignItems: 'center',
     justifyContent: 'center',
   },
   modalButtonText: {
-    fontSize: font.body,
-    fontWeight: '800',
-    color: colors.white,
+    ...typography.label,
+    color: colors.bone,
   },
   modalCancel: {
     alignItems: 'center',
     paddingVertical: spacing.sm,
   },
   modalCancelText: {
-    fontSize: font.body,
-    fontWeight: '700',
-    color: colors.textSecondary,
+    ...typography.label,
+    color: colors.ink60,
   },
 });

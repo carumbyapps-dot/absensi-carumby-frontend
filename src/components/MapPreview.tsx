@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
-import { radius } from '@/theme';
+import { colors } from '@/theme';
 
 interface Props {
   latitude: number;
@@ -22,7 +22,7 @@ export default function MapPreview({ latitude, longitude, height = 160 }: Props)
         scrollEnabled={false}
         zoomEnabled={false}
       >
-        <Marker coordinate={{ latitude, longitude }} />
+        <Marker coordinate={{ latitude, longitude }} pinColor={colors.red} />
       </MapView>
     </View>
   );
@@ -30,8 +30,8 @@ export default function MapPreview({ latitude, longitude, height = 160 }: Props)
 
 const styles = StyleSheet.create({
   wrap: {
-    borderRadius: radius.lg,
-    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: colors.ink12,
   },
   map: {
     flex: 1,

@@ -1,0 +1,59 @@
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { colors, spacing, typography } from '@/theme';
+import MenuCard from '@/components/MenuCard';
+
+export default function AdminScreen() {
+  const router = useRouter();
+
+  return (
+    <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <View style={styles.section}>
+        <Text style={styles.sectionLabel}>Operasional</Text>
+        <MenuCard
+          icon="checkmark-done-outline"
+          title="Persetujuan Cuti"
+          subtitle="Tinjau & putuskan pengajuan karyawan"
+          onPress={() => router.push('/admin/approve')}
+        />
+        <MenuCard
+          icon="people-outline"
+          title="Data Karyawan"
+          subtitle="Divisi, jabatan, tanggal masuk, peran"
+          onPress={() => router.push('/admin/karyawan')}
+        />
+      </View>
+      <View style={styles.section}>
+        <Text style={styles.sectionLabel}>Referensi</Text>
+        <MenuCard
+          icon="business-outline"
+          title="Divisi"
+          subtitle="Kelola struktur divisi organisasi"
+          onPress={() => router.push('/admin/divisi')}
+        />
+        <MenuCard
+          icon="calendar-outline"
+          title="Hari Libur"
+          subtitle="Kelola libur nasional & libur bersama"
+          onPress={() => router.push('/admin/libur')}
+        />
+      </View>
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  content: {
+    padding: spacing.lg,
+    paddingBottom: spacing.xxl,
+  },
+  section: {
+    marginTop: spacing.lg,
+  },
+  sectionLabel: {
+    ...typography.label,
+    color: colors.ink,
+    fontSize: 12,
+    marginBottom: spacing.sm,
+  },
+});

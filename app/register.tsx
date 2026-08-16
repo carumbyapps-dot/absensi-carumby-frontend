@@ -12,7 +12,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { Link, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { colors, font, radius, spacing } from '@/theme';
+import { colors, font, fontFamily, spacing, typography } from '@/theme';
 import { useAuth, authErrorMessage } from '@/store/auth';
 import FormField from '@/components/FormField';
 
@@ -62,7 +62,7 @@ export default function RegisterScreen() {
       <View style={[styles.container, styles.center]}>
         <StatusBar style="dark" />
         <View style={styles.successIcon}>
-          <Ionicons name="mail-outline" size={40} color={colors.white} />
+          <Ionicons name="mail-outline" size={32} color={colors.bone} />
         </View>
         <Text style={styles.successTitle}>Akun berhasil dibuat</Text>
         <Text style={styles.successText}>
@@ -92,7 +92,7 @@ export default function RegisterScreen() {
       >
         <View style={styles.header}>
           <Pressable style={styles.back} onPress={() => router.back()}>
-            <Ionicons name="chevron-back" size={24} color={colors.text} />
+            <Ionicons name="chevron-back" size={24} color={colors.ink} />
           </Pressable>
           <View style={styles.headerText}>
             <Text style={styles.title}>Buat Akun</Text>
@@ -102,7 +102,7 @@ export default function RegisterScreen() {
           </View>
         </View>
 
-        <View style={styles.card}>
+        <View style={styles.group}>
           <FormField
             label="Nama Lengkap"
             icon="person-outline"
@@ -145,7 +145,7 @@ export default function RegisterScreen() {
 
           {error && (
             <View style={styles.errorBox}>
-              <Ionicons name="alert-circle-outline" size={18} color={colors.danger} />
+              <Ionicons name="alert-circle-outline" size={18} color={colors.red} />
               <Text style={styles.errorText}>{error}</Text>
             </View>
           )}
@@ -156,9 +156,9 @@ export default function RegisterScreen() {
             disabled={submitting}
           >
             {submitting ? (
-              <ActivityIndicator color={colors.white} />
+              <ActivityIndicator color={colors.bone} />
             ) : (
-              <Ionicons name="person-add-outline" size={18} color={colors.white} />
+              <Ionicons name="person-add-outline" size={18} color={colors.bone} />
             )}
             <Text style={styles.primaryButtonText}>{submitting ? 'Mendaftar…' : 'Daftar'}</Text>
           </Pressable>
@@ -179,7 +179,7 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.bone,
   },
   center: {
     alignItems: 'center',
@@ -201,10 +201,8 @@ const styles = StyleSheet.create({
   back: {
     width: 40,
     height: 40,
-    borderRadius: radius.lg,
-    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.ink12,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -213,19 +211,18 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   title: {
-    fontSize: font.title,
-    fontWeight: '800',
-    color: colors.text,
+    ...typography.d3,
+    fontSize: 18,
+    color: colors.ink,
   },
   subtitle: {
-    fontSize: font.label,
-    color: colors.textSecondary,
+    fontFamily: fontFamily.regular,
+    fontSize: font.caption,
+    color: colors.ink60,
   },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.xl,
+  group: {
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.ink12,
     padding: spacing.xl,
     gap: spacing.lg,
   },
@@ -233,33 +230,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
-    backgroundColor: '#FEF2F2',
-    borderRadius: radius.lg,
     borderWidth: 1,
-    borderColor: '#FECACA',
+    borderColor: colors.red,
     padding: spacing.md,
   },
   errorText: {
     flex: 1,
-    fontSize: font.label,
-    color: colors.danger,
+    fontFamily: fontFamily.regular,
+    fontSize: font.caption,
+    color: colors.red,
   },
   primaryButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    backgroundColor: colors.primary,
-    borderRadius: radius.lg,
+    backgroundColor: colors.red,
     paddingVertical: spacing.lg,
   },
   pressed: {
     opacity: 0.8,
   },
   primaryButtonText: {
-    fontSize: font.body,
-    fontWeight: '800',
-    color: colors.white,
+    ...typography.label,
+    color: colors.bone,
   },
   links: {
     alignItems: 'center',
@@ -268,27 +262,26 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
   },
   linkText: {
-    fontSize: font.label,
-    fontWeight: '700',
-    color: colors.primary,
+    ...typography.label,
+    color: colors.red,
   },
   successIcon: {
-    width: 88,
-    height: 88,
-    borderRadius: radius.full,
-    backgroundColor: colors.success,
+    width: 72,
+    height: 72,
+    backgroundColor: colors.lumut,
     alignItems: 'center',
     justifyContent: 'center',
   },
   successTitle: {
-    fontSize: font.title,
-    fontWeight: '800',
-    color: colors.text,
+    ...typography.d2,
+    fontSize: 20,
+    color: colors.ink,
     textAlign: 'center',
   },
   successText: {
+    fontFamily: fontFamily.regular,
     fontSize: font.body,
-    color: colors.textSecondary,
+    color: colors.ink60,
     textAlign: 'center',
     lineHeight: 22,
   },

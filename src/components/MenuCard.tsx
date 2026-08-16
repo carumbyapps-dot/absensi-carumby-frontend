@@ -1,11 +1,10 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, font, radius, spacing } from '@/theme';
+import { colors, font, spacing, typography } from '@/theme';
 
 interface Props {
   icon: keyof typeof Ionicons.glyphMap;
   iconColor?: string;
-  iconBg?: string;
   title: string;
   subtitle: string;
   onPress?: () => void;
@@ -13,47 +12,45 @@ interface Props {
 
 export default function MenuCard({
   icon,
-  iconColor = colors.primary,
-  iconBg = colors.primaryLight,
+  iconColor = colors.red,
   title,
   subtitle,
   onPress,
 }: Props) {
   return (
     <Pressable
-      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+      style={({ pressed }) => [styles.row, pressed && styles.pressed]}
       onPress={onPress}
     >
-      <View style={[styles.iconWrap, { backgroundColor: iconBg }]}>
-        <Ionicons name={icon} size={24} color={iconColor} />
+      <View style={styles.iconWrap}>
+        <Ionicons name={icon} size={18} color={iconColor} />
       </View>
       <View style={styles.info}>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.subtitle}>{subtitle}</Text>
       </View>
-      <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
+      <Ionicons name="arrow-forward" size={16} color={colors.ink} />
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
+  row: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
+    paddingVertical: spacing.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.ink12,
   },
   pressed: {
-    opacity: 0.7,
+    opacity: 0.6,
   },
   iconWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: radius.md,
+    width: 36,
+    height: 36,
+    borderWidth: 1,
+    borderColor: colors.ink12,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -62,12 +59,13 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   title: {
-    fontSize: font.body,
-    fontWeight: '700',
-    color: colors.text,
+    ...typography.label,
+    color: colors.ink,
+    fontSize: 12,
   },
   subtitle: {
-    fontSize: font.label,
-    color: colors.textSecondary,
+    fontFamily: 'Archivo_400Regular',
+    fontSize: font.caption,
+    color: colors.ink60,
   },
 });

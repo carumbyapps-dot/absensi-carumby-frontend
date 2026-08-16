@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, font, radius, spacing } from '@/theme';
+import { colors, fontFamily, font, spacing, typography } from '@/theme';
 
 interface Props {
   latitude: number;
@@ -11,7 +11,7 @@ interface Props {
 export default function MapPreview({ latitude, longitude, height = 160 }: Props) {
   return (
     <View style={[styles.wrap, { height }]}>
-      <Ionicons name="location" size={28} color={colors.primary} />
+      <Ionicons name="location" size={24} color={colors.red} />
       <Text style={styles.coords}>
         {latitude.toFixed(5)}, {longitude.toFixed(5)}
       </Text>
@@ -22,22 +22,21 @@ export default function MapPreview({ latitude, longitude, height = 160 }: Props)
 
 const styles = StyleSheet.create({
   wrap: {
-    borderRadius: radius.lg,
-    backgroundColor: colors.primaryLight,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.ink12,
+    backgroundColor: colors.bone,
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
   },
   coords: {
+    fontFamily: fontFamily.semibold,
     fontSize: font.body,
-    fontWeight: '700',
-    color: colors.primaryDark,
-    fontVariant: ['tabular-nums'],
+    color: colors.ink,
   },
   hint: {
-    fontSize: font.caption,
-    color: colors.textMuted,
+    fontFamily: fontFamily.regular,
+    fontSize: font.tiny,
+    color: colors.ink38,
   },
 });

@@ -1,6 +1,6 @@
 import { StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, font, radius, spacing } from '@/theme';
+import { colors, font, fontFamily, spacing, typography } from '@/theme';
 
 interface Props extends TextInputProps {
   label: string;
@@ -12,10 +12,10 @@ export default function FormField({ label, icon, style, ...rest }: Props) {
     <View style={styles.field}>
       <Text style={styles.label}>{label}</Text>
       <View style={styles.inputWrap}>
-        {icon && <Ionicons name={icon} size={18} color={colors.textMuted} />}
+        {icon && <Ionicons name={icon} size={18} color={colors.ink38} />}
         <TextInput
           style={[styles.input, style]}
-          placeholderTextColor={colors.textMuted}
+          placeholderTextColor={colors.ink38}
           {...rest}
         />
       </View>
@@ -28,24 +28,23 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   label: {
-    fontSize: font.label,
-    fontWeight: '700',
-    color: colors.text,
+    ...typography.label,
+    fontSize: 10,
+    color: colors.ink,
   },
   inputWrap: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.ink12,
     paddingHorizontal: spacing.lg,
   },
   input: {
     flex: 1,
     paddingVertical: spacing.md + 2,
+    fontFamily: fontFamily.regular,
     fontSize: font.body,
-    color: colors.text,
+    color: colors.ink,
   },
 });

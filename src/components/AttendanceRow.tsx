@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { colors, font, radius, spacing } from '@/theme';
+import { colors, fontFamily, font, numerals, spacing, typography } from '@/theme';
 import { AttendanceRecord, TYPE_LABEL } from '@/types/attendance';
 import StatusBadge from './StatusBadge';
 
@@ -17,21 +17,19 @@ function formatTime(iso: string): string {
 export default function AttendanceRow({ record }: Props) {
   const router = useRouter();
   const isIn = record.type === 'in';
-  const icon = isIn ? 'arrow-up-circle' : 'arrow-down-circle';
-  const iconColor = isIn ? colors.success : colors.primary;
+  const icon = isIn ? 'arrow-up' : 'arrow-down';
+  const iconColor = isIn ? colors.lumut : colors.ink;
 
   return (
     <Pressable
       style={({ pressed }) => [styles.row, pressed && styles.pressed]}
       onPress={() => router.push({ pathname: '/detail', params: { id: record.id } })}
     >
-      <View style={[styles.iconWrap, { backgroundColor: isIn ? colors.successLight : colors.primaryLight }]}>
-        <Ionicons name={icon} size={22} color={iconColor} />
+      <View style={[styles.iconWrap, { borderColor: isIn ? colors.lumut : colors.ink }]}>
+        <Ionicons name={icon} size={16} color={iconColor} />
       </View>
-      <View style={styles.info}>
-        <Text style={styles.title}>{TYPE_LABEL[record.type]}</Text>
-        <Text style={styles.subtitle}>{formatTime(record.timestamp)}</Text>
-      </View>
+      <Text style={styles.title}>{TYPE_LABEL[record.type]}</Text>
+      <Text style={styles.time}>{formatTime(record.timestamp)}</Text>
       <StatusBadge status={record.status} />
     </Pressable>
   );
@@ -42,33 +40,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
+    paddingVertical: spacing.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.ink12,
   },
   pressed: {
-    opacity: 0.7,
+    opacity: 0.6,
   },
   iconWrap: {
-    width: 44,
-    height: 44,
-    borderRadius: radius.md,
+    width: 32,
+    height: 32,
+    borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  info: {
-    flex: 1,
-    gap: 2,
-  },
   title: {
-    fontSize: font.body,
-    fontWeight: '700',
-    color: colors.text,
+    flex: 1,
+    ...typography.label,
+    color: colors.ink,
+    fontSize: 12,
   },
-  subtitle: {
-    fontSize: font.label,
-    color: colors.textSecondary,
+  time: {
+    ...numerals,
+    fontFamily: fontFamily.semibold,
+    fontSize: font.body,
+    color: colors.ink,
   },
 });

@@ -1,9 +1,9 @@
 import { ActivityIndicator, Image, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Link, useRouter } from 'expo-router';
+import { Link, useRouter, type Href } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, font, radius, spacing } from '@/theme';
+import { colors, font, fontFamily, numerals, radius, spacing, typography } from '@/theme';
 import { useNow, formatClock, formatDateLong, greeting } from '@/hooks/useNow';
 import { useRecordsForDate } from '@/store/attendance';
 import { useAuth } from '@/store/auth';
@@ -40,7 +40,7 @@ export default function HomeScreen() {
           <RefreshControl
             refreshing={loading && records === null}
             onRefresh={() => reload()}
-            tintColor={colors.primary}
+            tintColor={colors.ink}
           />
         }
       >
@@ -55,14 +55,14 @@ export default function HomeScreen() {
               {user?.avatarUrl ? (
                 <Image source={{ uri: user.avatarUrl }} style={styles.avatarImage} />
               ) : (
-                <Ionicons name="person" size={24} color={colors.white} />
+                <Ionicons name="person" size={20} color={colors.bone} />
               )}
             </Pressable>
           </Link>
         </View>
 
-        <View style={styles.absenCard}>
-          <View style={styles.absenCardHeader}>
+        <View style={styles.hero}>
+          <View style={styles.heroTop}>
             <View style={styles.liveRow}>
               <View style={styles.liveDot} />
               <Text style={styles.liveLabel}>Waktu sekarang</Text>
@@ -70,36 +70,59 @@ export default function HomeScreen() {
             <Text style={styles.clock}>{formatClock(now)}</Text>
           </View>
 
-          <Text style={styles.absenTitle}>Absen Sekarang</Text>
-          <Text style={styles.absenSubtitle}>{absenStateLabel}</Text>
+          <Text style={styles.heroTitle}>Absen Sekarang</Text>
+          <Text style={styles.heroSubtitle}>{absenStateLabel}</Text>
 
           <Pressable
-            style={({ pressed }) => [styles.absenButton, pressed && styles.buttonPressed]}
+            style={({ pressed }) => [styles.heroButton, pressed && styles.buttonPressed]}
             onPress={() => router.push({ pathname: '/absen', params: { mode: nextMode } })}
           >
             <Ionicons
               name={nextMode === 'in' ? 'log-in-outline' : 'log-out-outline'}
-              size={20}
-              color={colors.primaryDark}
+              size={18}
+              color={colors.bone}
             />
-            <Text style={styles.absenButtonText}>{nextModeLabel}</Text>
+            <Text style={styles.heroButtonText}>{nextModeLabel}</Text>
           </Pressable>
         </View>
 
-        <View style={styles.menuSection}>
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>Menu</Text>
           <MenuCard
             icon="calendar-outline"
-            iconColor={colors.primary}
-            iconBg={colors.primaryLight}
+            iconColor={colors.ink}
             title="Riwayat Absen"
             subtitle="Lihat riwayat dan filter per tanggal"
             onPress={() => router.push('/riwayat')}
           />
+          <MenuCard
+            icon="bed-outline"
+            iconColor={colors.ink}
+            title="Cuti & Izin"
+            subtitle="Ajukan cuti, lihat saldo dan riwayat pengajuan"
+            onPress={() => router.push('/cuti')}
+          />
+          <MenuCard
+            icon="calendar-clear-outline"
+            iconColor={colors.ink}
+            title="Kalender Libur"
+            subtitle="Hari libur nasional, libur bersama & perusahaan"
+            onPress={() => router.push('/kalender')}
+          />
+          {user?.role === 'admin' && (
+            <MenuCard
+              icon="shield-checkmark-outline"
+              iconColor={colors.red}
+              title="Panel Admin"
+              subtitle="Persetujuan cuti, data karyawan, divisi & libur"
+              onPress={() => router.push('/admin' as Href)}
+            />
+          )}
         </View>
 
-        <View style={styles.listSection}>
+        <View style={styles.section}>
           <View style={styles.listHeader}>
-            <Text style={styles.sectionTitle}>Absen Hari Ini</Text>
+            <Text style={styles.sectionLabel}>Absen Hari Ini</Text>
             <Pressable onPress={() => router.push('/riwayat')}>
               <Text style={styles.linkText}>Lihat semua</Text>
             </Pressable>
@@ -107,12 +130,12 @@ export default function HomeScreen() {
 
           {loading && records === null ? (
             <View style={styles.stateBox}>
-              <ActivityIndicator color={colors.primary} />
+              <ActivityIndicator color={colors.ink} />
               <Text style={styles.stateText}>Memuat data absen…</Text>
             </View>
           ) : error ? (
             <View style={styles.stateBox}>
-              <Ionicons name="cloud-offline-outline" size={28} color={colors.textMuted} />
+              <Ionicons name="cloud-offline-outline" size={22} color={colors.ink38} />
               <Text style={styles.stateText}>{error}</Text>
               <Pressable onPress={() => reload()}>
                 <Text style={styles.linkText}>Coba lagi</Text>
@@ -120,11 +143,11 @@ export default function HomeScreen() {
             </View>
           ) : todayRecords.length === 0 ? (
             <View style={styles.stateBox}>
-              <Ionicons name="calendar-clear-outline" size={28} color={colors.textMuted} />
+              <Ionicons name="calendar-clear-outline" size={22} color={colors.ink38} />
               <Text style={styles.stateText}>Belum ada absen hari ini</Text>
             </View>
           ) : (
-            <View style={styles.list}>
+            <View>
               {todayRecords.map((record) => (
                 <AttendanceRow key={record.id} record={record} />
               ))}
@@ -139,7 +162,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.bone,
   },
   content: {
     paddingHorizontal: spacing.lg,
@@ -152,26 +175,27 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.lg,
   },
   greeting: {
-    fontSize: font.label,
-    color: colors.textSecondary,
-    fontWeight: '600',
+    ...typography.label,
+    color: colors.ink60,
+    fontSize: 10,
   },
   headerName: {
-    fontSize: font.title,
-    fontWeight: '800',
-    color: colors.text,
-    marginTop: 2,
+    ...typography.d2,
+    color: colors.ink,
+    fontSize: 24,
+    marginTop: 4,
   },
   headerDate: {
+    fontFamily: fontFamily.regular,
     fontSize: font.caption,
-    color: colors.textMuted,
+    color: colors.ink60,
     marginTop: 2,
   },
   avatar: {
     width: 44,
     height: 44,
     borderRadius: radius.full,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.ink,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
@@ -181,14 +205,13 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   pressed: {
-    opacity: 0.7,
+    opacity: 0.6,
   },
-  absenCard: {
-    backgroundColor: colors.primary,
-    borderRadius: radius.xl,
+  hero: {
+    backgroundColor: colors.ink,
     padding: spacing.xl,
   },
-  absenCardHeader: {
+  heroTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -199,88 +222,83 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   liveDot: {
-    width: 8,
-    height: 8,
+    width: 7,
+    height: 7,
     borderRadius: radius.full,
-    backgroundColor: '#34D399',
+    backgroundColor: colors.lumut,
   },
   liveLabel: {
-    fontSize: font.caption,
-    color: '#C7D2FE',
-    fontWeight: '600',
+    ...typography.label,
+    fontSize: 10,
+    color: colors.bone55,
   },
   clock: {
-    fontSize: font.heading,
-    fontWeight: '800',
-    color: colors.white,
-    fontVariant: ['tabular-nums'],
+    ...numerals,
+    fontFamily: fontFamily.black,
+    fontSize: font.d3,
+    color: colors.bone,
+    letterSpacing: 0.6,
   },
-  absenTitle: {
+  heroTitle: {
+    ...typography.d1,
+    color: colors.bone,
     fontSize: 28,
-    fontWeight: '800',
-    color: colors.white,
     marginTop: spacing.xl,
   },
-  absenSubtitle: {
+  heroSubtitle: {
+    fontFamily: fontFamily.regular,
     fontSize: font.body,
-    color: '#C7D2FE',
+    color: colors.bone55,
     marginTop: spacing.xs,
   },
-  absenButton: {
+  heroButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    backgroundColor: colors.white,
-    borderRadius: radius.lg,
+    backgroundColor: colors.red,
     paddingVertical: spacing.lg,
     marginTop: spacing.xl,
   },
   buttonPressed: {
-    opacity: 0.9,
-    transform: [{ scale: 0.98 }],
+    opacity: 0.85,
+    transform: [{ scale: 0.99 }],
   },
-  absenButtonText: {
-    fontSize: font.body,
-    fontWeight: '800',
-    color: colors.primaryDark,
+  heroButtonText: {
+    ...typography.label,
+    color: colors.bone,
+    fontSize: 12,
   },
-  menuSection: {
-    marginTop: spacing.lg,
-  },
-  listSection: {
+  section: {
     marginTop: spacing.xl,
   },
   listHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing.md,
+    marginBottom: spacing.sm,
   },
-  sectionTitle: {
-    fontSize: font.heading,
-    fontWeight: '800',
-    color: colors.text,
+  sectionLabel: {
+    ...typography.label,
+    color: colors.ink,
+    fontSize: 12,
   },
   linkText: {
-    fontSize: font.label,
-    fontWeight: '700',
-    color: colors.primary,
-  },
-  list: {
-    gap: spacing.md,
+    ...typography.label,
+    fontSize: 10,
+    color: colors.red,
   },
   stateBox: {
     alignItems: 'center',
     gap: spacing.md,
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderStyle: 'dashed',
+    borderColor: colors.ink38,
     paddingVertical: spacing.xxl,
   },
   stateText: {
-    fontSize: font.label,
-    color: colors.textSecondary,
+    fontFamily: fontFamily.regular,
+    fontSize: font.caption,
+    color: colors.ink60,
   },
 });
