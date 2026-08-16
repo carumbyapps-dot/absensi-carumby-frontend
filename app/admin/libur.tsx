@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { apiFetch, getErrorMessage } from '@/lib/api';
-import { downloadCsv } from '@/lib/export';
+import { downloadCsv, downloadCsvContent } from '@/lib/export';
 import { colors, font, fontFamily, spacing, typography } from '@/theme';
 import { formatDateLong, Holiday, HOLIDAY_TYPE_LABEL } from '@/types/leave';
 import DateField from '@/components/DateField';
@@ -124,6 +124,16 @@ export default function AdminLiburScreen() {
     }
   };
 
+  const doTemplate = async () => {
+    const ok = await downloadCsvContent(
+      'template-hari-libur.txt',
+      '2027-01-01 = Tahun Baru 2027\n2027-02-09 = Tahun Baru Imlek 2578 Kongzili\n2027-04-13 = Hari Raya Idul Fitri 1448 Hijriah',
+    );
+    if (!ok) {
+      Alert.alert('Template disalin', 'Template disalin ke clipboard — tempel lalu ubah sesuai daftar hari libur.');
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
       <View style={styles.yearRow}>
@@ -156,7 +166,13 @@ export default function AdminLiburScreen() {
         </Pressable>
       </View>
 
-      <Text style={styles.sectionLabel}>Impor Massal</Text>
+      <View style={styles.ioRow}>
+        <Text style={styles.sectionLabel}>Impor Massal</Text>
+        <Pressable style={({ pressed }) => [styles.templateBtn, pressed && styles.pressed]} onPress={doTemplate}>
+          <Ionicons name="download-outline" size={13} color={colors.red} />
+          <Text style={styles.templateBtnText}>Unduh Template</Text>
+        </Pressable>
+      </View>
       <TextInput
         style={[styles.input, styles.importArea]}
         placeholder={IMPORT_PLACEHOLDER}
@@ -249,6 +265,22 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginBottom: spacing.md,
     marginTop: spacing.lg,
+  },
+  ioRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  templateBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    marginTop: spacing.lg,
+  },
+  templateBtnText: {
+    ...typography.label,
+    fontSize: 10,
+    color: colors.red,
   },
   input: {
     flex: 1,

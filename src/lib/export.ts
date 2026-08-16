@@ -3,6 +3,28 @@ import * as Clipboard from 'expo-clipboard';
 import { API_URL, getToken } from './api';
 
 /**
+ * Unduh/salin konten teks (CSV atau lainnya).
+ * Web: unduh sebagai file (return true). Native: salin ke clipboard (return false).
+ */
+export async function downloadCsvContent(filename: string, content: string): Promise<boolean> {
+  const text = content.replace(/^\uFEFF/, '');
+  if (Platform.OS === 'web') {
+    const blob = new Blob(['\uFEFF' + text], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = filename;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+    return true;
+  }
+  await Clipboard.setStringAsync(text);
+  return false;
+}
+
+/**
  * Ambil isi CSV dari endpoint terproteksi.
  * Web: unduh langsung sebagai file. Native: salin ke clipboard (return false).
  */
@@ -14,22 +36,8 @@ export async function downloadCsv(path: string): Promise<boolean | null> {
   });
   if (!res.ok) return null;
   const text = (await res.text()).replace(/^\uFEFF/, '');
-
-  if (Platform.OS === 'web') {
-    const blob = new Blob(['\uFEFF' + text], { type: 'text/csv;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = (path.split('/').pop()?.split('?')[0] ?? 'export') + '.csv';
-    document.body.appendChild(anchor);
-    anchor.click();
-    anchor.remove();
-    URL.revokeObjectURL(url);
-    return true;
-  }
-
-  await Clipboard.setStringAsync(text);
-  return false;
+  const filename = (path.split('/').pop()?.split('?')[0] ?? 'export') + '.csv';
+  return downloadCsvContent(filename, text);
 }
 
 /** Impor CSV dengan menempel teks (dipakai semua layar admin). */

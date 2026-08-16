@@ -317,6 +317,10 @@ export default function AdminJadwalScreen() {
         title={`Import Jadwal — ${MONTH_LABEL[month - 1]} ${year}`}
         hint="Kolom: tanggal,jam_mulai,jam_selesai — satu baris per tanggal. Baris bermasalah dilewati dan dilaporkan."
         placeholder={'tanggal,jam_mulai,jam_selesai\n2026-09-01,13:00,21:00\n2026-09-02,13:00,21:00'}
+        template={{
+          filename: `template-jadwal-${year}-${String(month).padStart(2, '0')}.csv`,
+          content: 'tanggal,jam_mulai,jam_selesai\n2026-09-01,13:00,21:00\n2026-09-02,13:00,21:00\n2026-09-03,13:00,21:00',
+        }}
         busy={importBusy}
         onSubmit={doImport}
         onClose={() => setImportVisible(false)}

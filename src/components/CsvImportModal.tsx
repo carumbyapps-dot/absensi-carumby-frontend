@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   Modal,
   Pressable,
   ScrollView,
@@ -10,7 +11,13 @@ import {
   View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { downloadCsvContent } from '@/lib/export';
 import { colors, font, fontFamily, spacing, typography } from '@/theme';
+
+interface Template {
+  filename: string;
+  content: string;
+}
 
 interface Props {
   visible: boolean;
@@ -18,17 +25,26 @@ interface Props {
   hint: string;
   placeholder: string;
   busy: boolean;
+  template?: Template;
   onSubmit: (csv: string) => void;
   onClose: () => void;
 }
 
 /** Modal tempel CSV untuk impor massal (web & native). */
-export default function CsvImportModal({ visible, title, hint, placeholder, busy, onSubmit, onClose }: Props) {
+export default function CsvImportModal({ visible, title, hint, placeholder, busy, template, onSubmit, onClose }: Props) {
   const [text, setText] = useState('');
 
   const close = () => {
     setText('');
     onClose();
+  };
+
+  const downloadTemplate = async () => {
+    if (!template) return;
+    const ok = await downloadCsvContent(template.filename, template.content);
+    if (!ok) {
+      Alert.alert('Template disalin', 'Template disalin ke clipboard — tempel di Excel/Sheets lalu isi sesuai format.');
+    }
   };
 
   return (
@@ -39,6 +55,12 @@ export default function CsvImportModal({ visible, title, hint, placeholder, busy
             <View style={styles.headerInfo}>
               <Text style={styles.title}>{title}</Text>
               <Text style={styles.hint}>{hint}</Text>
+              {template && (
+                <Pressable style={({ pressed }) => [styles.templateBtn, pressed && styles.pressed]} onPress={downloadTemplate}>
+                  <Ionicons name="download-outline" size={13} color={colors.red} />
+                  <Text style={styles.templateText}>Unduh Template</Text>
+                </Pressable>
+              )}
             </View>
             <Pressable style={({ pressed }) => [styles.closeBtn, pressed && styles.pressed]} onPress={close}>
               <Ionicons name="close" size={20} color={colors.ink} />
@@ -109,6 +131,18 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.regular,
     fontSize: font.caption,
     color: colors.ink60,
+  },
+  templateBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: spacing.xs,
+    marginTop: spacing.sm,
+  },
+  templateText: {
+    ...typography.label,
+    fontSize: 10,
+    color: colors.red,
   },
   closeBtn: {
     width: 32,

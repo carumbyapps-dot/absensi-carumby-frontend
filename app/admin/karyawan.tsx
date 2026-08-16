@@ -214,6 +214,10 @@ export default function AdminKaryawanScreen() {
         title="Import Data Karyawan"
         hint="Kolom: nama,email,peran,divisi,jabatan,tanggal_masuk,status. Dicocokkan dengan EMAIL yang sudah terdaftar — tidak membuat akun baru."
         placeholder={'nama,email,peran,divisi,jabatan,tanggal_masuk,status\nBudi Santoso,budi@carumby.id,employee,Gudang,Staff Gudang,2026-01-05,active'}
+        template={{
+          filename: 'template-data-karyawan.csv',
+          content: 'nama,email,peran,divisi,jabatan,tanggal_masuk,status\nBudi Santoso,budi@carumby.id,employee,Gudang,Staff Gudang,2026-01-05,active',
+        }}
         busy={importBusy}
         onSubmit={doImport}
         onClose={() => setImportVisible(false)}
