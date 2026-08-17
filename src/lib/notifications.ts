@@ -1,4 +1,5 @@
 import { Platform } from 'react-native';
+import Constants from 'expo-constants';
 
 type NotificationsModule = typeof import('expo-notifications');
 
@@ -7,6 +8,15 @@ const CHANNEL = 'shift-reminders';
 let mod: NotificationsModule | null = null;
 let loadTried = false;
 
+/** Di Expo Go (SDK 53+) modul notifikasi terbatas & memicu error — nonaktifkan total. */
+function isExpoGo(): boolean {
+  try {
+    return Constants.appOwnership === 'expo';
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Muat expo-notifications secara dinamis. Di Expo Go SDK 53+ modul ini
  * melempar error saat di-import — jadi dibungkus try/catch agar aplikasi
@@ -14,7 +24,7 @@ let loadTried = false;
  * development build).
  */
 async function getNotifications(): Promise<NotificationsModule | null> {
-  if (Platform.OS === 'web') return null;
+  if (Platform.OS === 'web' || isExpoGo()) return null;
   if (mod) return mod;
   if (loadTried) return null;
   loadTried = true;
@@ -31,7 +41,7 @@ async function getNotifications(): Promise<NotificationsModule | null> {
     return mod;
   } catch (err) {
     console.warn(
-      '[notifikasi] expo-notifications tidak tersedia di Expo Go — pengingat shift & notifikasi pengumuman nonaktif selama development',
+      '[notifikasi] expo-notifications gagal dimuat — pengingat shift & notifikasi pengumuman nonaktif',
       err instanceof Error ? err.message : '',
     );
     return null;
@@ -40,7 +50,7 @@ async function getNotifications(): Promise<NotificationsModule | null> {
 
 /** Notifikasi lokal tidak didukung di web (guard untuk semua pemanggil). */
 export function notificationsSupported(): boolean {
-  return Platform.OS !== 'web';
+  return Platform.OS !== 'web' && !isExpoGo();
 }
 
 export async function ensureNotificationPermission(): Promise<boolean> {

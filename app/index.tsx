@@ -16,6 +16,7 @@ import { WorkScheduleRecord } from '@/types/schedule';
 import AttendanceRow from '@/components/AttendanceRow';
 import MenuCard from '@/components/MenuCard';
 import BrandMark from '@/components/BrandMark';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
@@ -104,17 +105,17 @@ export default function HomeScreen() {
           </View>
           <Link href="/profil" asChild>
             <Pressable style={({ pressed }) => [styles.avatar, pressed && styles.pressed]}>
-              {user?.avatarUrl ? (
-                <Image source={{ uri: user.avatarUrl }} style={styles.avatarImage} />
-              ) : (
-                <Ionicons name="person" size={20} color={colors.bone} />
-              )}
+              {/* Foto avatar jarak jauh sengaja tidak dirender di header beranda —
+                  memicu layar kosong pada sebagian perangkat Android (Expo Go).
+                  Foto profil tetap tampil di layar Profil. */}
+              <Ionicons name="person" size={20} color={colors.bone} />
             </Pressable>
           </Link>
         </View>
 
         <View style={styles.hero}>
-          <View style={styles.heroTop}>
+          <ErrorBoundary>
+            <View style={styles.heroTop}>
             <View style={styles.liveRow}>
               <View style={styles.liveDot} />
               <Text style={styles.liveLabel}>Waktu sekarang</Text>
@@ -136,9 +137,11 @@ export default function HomeScreen() {
             />
             <Text style={styles.heroButtonText}>{nextModeLabel}</Text>
           </Pressable>
+          </ErrorBoundary>
         </View>
 
         <View style={styles.section}>
+          <ErrorBoundary>
           <Text style={styles.sectionLabel}>Menu</Text>
           <MenuCard
             icon="person-outline"
@@ -194,6 +197,7 @@ export default function HomeScreen() {
               onPress={() => router.push('/admin' as Href)}
             />
           )}
+          </ErrorBoundary>
         </View>
 
         <View style={styles.section}>
