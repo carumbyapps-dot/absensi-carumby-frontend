@@ -1,16 +1,42 @@
 import { Platform } from 'react-native';
-import * as Notifications from 'expo-notifications';
+
+type NotificationsModule = typeof import('expo-notifications');
 
 const CHANNEL = 'shift-reminders';
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowBanner: true,
-    shouldShowList: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
+let mod: NotificationsModule | null = null;
+let loadTried = false;
+
+/**
+ * Muat expo-notifications secara dinamis. Di Expo Go SDK 53+ modul ini
+ * melempar error saat di-import — jadi dibungkus try/catch agar aplikasi
+ * tetap berjalan (fitur pengingat otomatis nonaktif sampai pakai
+ * development build).
+ */
+async function getNotifications(): Promise<NotificationsModule | null> {
+  if (Platform.OS === 'web') return null;
+  if (mod) return mod;
+  if (loadTried) return null;
+  loadTried = true;
+  try {
+    mod = await import('expo-notifications');
+    mod.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowBanner: true,
+        shouldShowList: true,
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+      }),
+    });
+    return mod;
+  } catch (err) {
+    console.warn(
+      '[notifikasi] expo-notifications tidak tersedia di Expo Go — pengingat shift & notifikasi pengumuman nonaktif selama development',
+      err instanceof Error ? err.message : '',
+    );
+    return null;
+  }
+}
 
 /** Notifikasi lokal tidak didukung di web (guard untuk semua pemanggil). */
 export function notificationsSupported(): boolean {
@@ -18,19 +44,27 @@ export function notificationsSupported(): boolean {
 }
 
 export async function ensureNotificationPermission(): Promise<boolean> {
-  if (!notificationsSupported()) return false;
-  const current = await Notifications.getPermissionsAsync();
-  if (current.granted) return true;
-  const req = await Notifications.requestPermissionsAsync();
-  return req.granted;
+  const N = await getNotifications();
+  if (!N) return false;
+  try {
+    const current = await N.getPermissionsAsync();
+    if (current.granted) return true;
+    const req = await N.requestPermissionsAsync();
+    return req.granted;
+  } catch {
+    return false;
+  }
 }
 
-async function ensureChannel(): Promise<void> {
-  if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync(CHANNEL, {
+async function ensureChannel(N: NotificationsModule): Promise<void> {
+  if (Platform.OS !== 'android') return;
+  try {
+    await N.setNotificationChannelAsync(CHANNEL, {
       name: 'Pengingat Shift',
-      importance: Notifications.AndroidImportance.DEFAULT,
+      importance: N.AndroidImportance.DEFAULT,
     });
+  } catch {
+    // abaikan — kanal default tetap dipakai
   }
 }
 
@@ -47,10 +81,17 @@ export interface ShiftReminderInput {
  */
 export async function scheduleShiftReminders(shift: ShiftReminderInput): Promise<void> {
   if (!notificationsSupported()) return;
+  const N = await getNotifications();
+  if (!N) return;
   const granted = await ensureNotificationPermission();
   if (!granted) return;
-  await ensureChannel();
-  await Notifications.cancelAllScheduledNotificationsAsync();
+  await ensureChannel(N);
+
+  try {
+    await N.cancelAllScheduledNotificationsAsync();
+  } catch {
+    // lanjut walau pembatalan gagal
+  }
 
   const start = shift.startTime ?? '08:00';
   const end = shift.endTime ?? '17:00';
@@ -77,24 +118,34 @@ export async function scheduleShiftReminders(shift: ShiftReminderInput): Promise
 
   for (const item of items) {
     if (item.date.getTime() <= Date.now()) continue;
-    await Notifications.scheduleNotificationAsync({
-      content: { title: item.title, body: item.body, sound: true },
-      trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.DATE,
-        date: item.date,
-        channelId: CHANNEL,
-      },
-    });
+    try {
+      await N.scheduleNotificationAsync({
+        content: { title: item.title, body: item.body, sound: true },
+        trigger: {
+          type: N.SchedulableTriggerInputTypes.DATE,
+          date: item.date,
+          channelId: CHANNEL,
+        },
+      });
+    } catch {
+      // abaikan satu pengingat gagal
+    }
   }
 }
 
 /** Notifikasi langsung saat ada pengumuman baru dari admin. */
 export async function notifyAnnouncement(title: string, body: string): Promise<void> {
   if (!notificationsSupported()) return;
+  const N = await getNotifications();
+  if (!N) return;
   const granted = await ensureNotificationPermission();
   if (!granted) return;
-  await Notifications.scheduleNotificationAsync({
-    content: { title: `Pengumuman: ${title}`, body, sound: true },
-    trigger: null,
-  });
+  try {
+    await N.scheduleNotificationAsync({
+      content: { title: `Pengumuman: ${title}`, body, sound: true },
+      trigger: null,
+    });
+  } catch {
+    // abaikan
+  }
 }
