@@ -79,8 +79,9 @@ export default function ProfilScreen() {
   };
 
   const doLogout = async () => {
+    // Jangan navigasi manual — auth gate di _layout otomatis mengarahkan
+    // ke layar Masuk saat status berubah jadi unauthenticated.
     await signOut();
-    router.replace('/');
   };
 
   const avatarOptions: SheetOption[] = [

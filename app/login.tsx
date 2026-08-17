@@ -39,6 +39,7 @@ export default function LoginScreen() {
     setResent(false);
     try {
       await signIn(email.trim(), password);
+      router.replace('/');
     } catch (err) {
       setError(authErrorMessage(err));
       setEmailNotVerified(isEmailNotVerifiedError(err));
