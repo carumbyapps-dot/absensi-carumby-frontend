@@ -11,6 +11,12 @@ export default function AdminScreen() {
       <View style={styles.section}>
         <Text style={styles.sectionLabel}>Operasional</Text>
         <MenuCard
+          icon="stats-chart-outline"
+          title="Statistik"
+          subtitle="Ringkasan kehadiran hari ini & 7 hari terakhir"
+          onPress={() => router.push('/admin/statistik')}
+        />
+        <MenuCard
           icon="checkmark-done-outline"
           title="Persetujuan Cuti"
           subtitle="Tinjau & putuskan pengajuan karyawan"
