@@ -105,10 +105,11 @@ export default function HomeScreen() {
           </View>
           <Link href="/profil" asChild>
             <Pressable style={({ pressed }) => [styles.avatar, pressed && styles.pressed]}>
-              {/* Foto avatar jarak jauh sengaja tidak dirender di header beranda —
-                  memicu layar kosong pada sebagian perangkat Android (Expo Go).
-                  Foto profil tetap tampil di layar Profil. */}
-              <Ionicons name="person" size={20} color={colors.bone} />
+              <Image
+                source={require('../assets/logo.png')}
+                style={styles.avatarLogo}
+                resizeMode="contain"
+              />
             </Pressable>
           </Link>
         </View>
@@ -288,10 +289,14 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: radius.full,
-    backgroundColor: colors.ink,
+    backgroundColor: colors.bone,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
+  },
+  avatarLogo: {
+    width: '100%',
+    height: '100%',
   },
   avatarImage: {
     width: '100%',

@@ -149,7 +149,7 @@ export default function ProfilScreen() {
         <Text style={styles.logoutText}>Logout</Text>
       </Pressable>
 
-      <Text style={styles.footer}>ABSEN KILAT V1.0.0</Text>
+      <Text style={styles.footer}>ANTRAC V1.0.0</Text>
 
       <OptionSheet
         visible={sheet === 'avatar'}

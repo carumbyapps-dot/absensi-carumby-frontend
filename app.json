@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Absen Kilat",
+    "name": "ANTRAC",
     "slug": "absen-kilat",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -45,19 +45,19 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Izinkan Absen Kilat menggunakan kamera untuk mengambil foto selfie sebagai bukti kehadiran."
+          "cameraPermission": "Izinkan ANTRAC menggunakan kamera untuk mengambil foto selfie sebagai bukti kehadiran."
         }
       ],
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Izinkan Absen Kilat menggunakan lokasi untuk mencatat koordinat GPS saat absen."
+          "locationWhenInUsePermission": "Izinkan ANTRAC menggunakan lokasi untuk mencatat koordinat GPS saat absen."
         }
       ],
       [
         "expo-image-picker",
         {
-          "photosPermission": "Izinkan Absen Kilat mengakses galeri untuk memilih foto profil."
+          "photosPermission": "Izinkan ANTRAC mengakses galeri untuk memilih foto profil."
         }
       ],
       "expo-font"

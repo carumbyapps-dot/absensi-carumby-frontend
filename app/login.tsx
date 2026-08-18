@@ -74,7 +74,7 @@ export default function LoginScreen() {
       >
         <View style={styles.brand}>
           <BrandMark size={72} />
-          <Text style={styles.brandTitle}>Absen Kilat</Text>
+          <Text style={styles.brandTitle}>ANTRAC</Text>
           <Text style={styles.brandSubtitle}>
             Catat kehadiranmu dengan cepat, aman, dan mudah
           </Text>
