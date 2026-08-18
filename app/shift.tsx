@@ -154,12 +154,12 @@ export default function ShiftScreen() {
       return;
     }
     const dur = shiftDurationMinutes(startTime, endTime);
-    if (dur < 8 * 60) {
+    if (dur < 9 * 60) {
       const h = Math.floor(dur / 60);
       const m = dur % 60;
       Alert.alert(
-        'Shift kurang dari 8 jam',
-        `${startTime}–${endTime} hanya ${h} jam${m > 0 ? ` ${m} menit` : ''}. Tetap kirim?`,
+        'Shift kurang dari standar 9 jam',
+        `${startTime}–${endTime} hanya ${h} jam${m > 0 ? ` ${m} menit` : ''}. Standar penuh adalah 9 jam (8 jam kerja + 1 jam istirahat). Tetap kirim?`,
         [
           { text: 'Batal', style: 'cancel' },
           { text: 'Tetap Kirim', onPress: () => doSubmit() },
