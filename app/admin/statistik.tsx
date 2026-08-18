@@ -91,9 +91,17 @@ export default function AdminStatistikScreen() {
           <Text style={styles.sectionLabel}>Statistik</Text>
           <Text style={styles.dateText}>{stats ? formatTanggal(stats.date) : ''}</Text>
         </View>
-        <Pressable style={({ pressed }) => [styles.refreshBtn, pressed && styles.pressed]} onPress={load}>
-          <Text style={styles.refreshText}>Muat Ulang</Text>
-        </Pressable>
+        <View style={styles.headerActions}>
+          <Pressable style={({ pressed }) => [styles.refreshBtn, pressed && styles.pressed]} onPress={load}>
+            <Text style={styles.refreshText}>Muat Ulang</Text>
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [styles.menuBtn, pressed && styles.pressed]}
+            onPress={() => router.push('/admin/menu')}
+          >
+            <Text style={styles.menuBtnText}>Menu</Text>
+          </Pressable>
+        </View>
       </View>
 
       {stats && (
@@ -214,6 +222,10 @@ const styles = StyleSheet.create({
     color: colors.ink60,
     marginTop: 2,
   },
+  headerActions: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
   refreshBtn: {
     borderWidth: 1,
     borderColor: colors.ink,
@@ -224,6 +236,16 @@ const styles = StyleSheet.create({
     ...typography.label,
     fontSize: 10,
     color: colors.ink,
+  },
+  menuBtn: {
+    backgroundColor: colors.ink,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  menuBtnText: {
+    ...typography.label,
+    fontSize: 10,
+    color: colors.bone,
   },
   pressed: {
     opacity: 0.8,
