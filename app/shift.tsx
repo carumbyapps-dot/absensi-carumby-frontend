@@ -41,6 +41,15 @@ interface ScheduleInfo {
   endTime: string;
 }
 
+/** Durasi shift dalam menit (mendukung lintas malam). */
+function shiftDurationMinutes(start: string, end: string): number {
+  const [sh, sm] = start.split(':').map(Number);
+  const [eh, em] = end.split(':').map(Number);
+  const s = sh * 60 + sm;
+  const e = eh * 60 + em;
+  return e > s ? e - s : 1440 - s + e;
+}
+
 function formatTanggal(date: string): string {
   const [y, m, d] = date.split('-').map(Number);
   return `${d} ${MONTH_LABEL[m - 1]} ${y}`;
@@ -115,15 +124,7 @@ export default function ShiftScreen() {
     load();
   }, [load]);
 
-  const submit = async () => {
-    if (!date || !/^\d{2}:\d{2}$/.test(startTime) || !/^\d{2}:\d{2}$/.test(endTime)) {
-      Alert.alert('Form belum lengkap', 'Isi tanggal dan jam shift (HH:MM)');
-      return;
-    }
-    if (reason.trim().length < 5) {
-      Alert.alert('Form belum lengkap', 'Alasan minimal 5 karakter');
-      return;
-    }
+  const doSubmit = async () => {
     setSubmitting(true);
     try {
       await apiFetch('/api/shifts/requests', {
@@ -141,6 +142,32 @@ export default function ShiftScreen() {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const submit = async () => {
+    if (!date || !/^\d{2}:\d{2}$/.test(startTime) || !/^\d{2}:\d{2}$/.test(endTime)) {
+      Alert.alert('Form belum lengkap', 'Isi tanggal dan jam shift (HH:MM)');
+      return;
+    }
+    if (reason.trim().length < 5) {
+      Alert.alert('Form belum lengkap', 'Alasan minimal 5 karakter');
+      return;
+    }
+    const dur = shiftDurationMinutes(startTime, endTime);
+    if (dur < 8 * 60) {
+      const h = Math.floor(dur / 60);
+      const m = dur % 60;
+      Alert.alert(
+        'Shift kurang dari 8 jam',
+        `${startTime}–${endTime} hanya ${h} jam${m > 0 ? ` ${m} menit` : ''}. Tetap kirim?`,
+        [
+          { text: 'Batal', style: 'cancel' },
+          { text: 'Tetap Kirim', onPress: () => doSubmit() },
+        ],
+      );
+      return;
+    }
+    await doSubmit();
   };
 
   const cancel = async (id: number) => {
