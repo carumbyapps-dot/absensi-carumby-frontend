@@ -27,6 +27,13 @@ interface StatsDay {
   lateIn: number;
 }
 
+interface StatsBelowHours {
+  userName: string;
+  email: string;
+  divisionName: string | null;
+  totalMinutes: number;
+}
+
 interface AdminStats {
   date: string;
   summary: {
@@ -40,6 +47,13 @@ interface AdminStats {
   last7Days: StatsDay[];
   pendingLeaves: number;
   pendingShiftRequests: number;
+  below40Hours: StatsBelowHours[];
+}
+
+function formatJamMenit(totalMinutes: number): string {
+  const h = Math.floor(totalMinutes / 60);
+  const m = totalMinutes % 60;
+  return `${h}j ${m}m`;
 }
 
 const DAY_LABEL = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
@@ -199,6 +213,25 @@ export default function AdminStatistikScreen() {
               <Text style={styles.reviewBtnText}>Tinjau</Text>
             </Pressable>
           </View>
+
+          <Text style={[styles.sectionLabel, styles.sectionSpacing]}>
+            Di Bawah 40 Jam Minggu Ini ({stats.below40Hours.length})
+          </Text>
+          {stats.below40Hours.length === 0 ? (
+            <View style={styles.stateBox}>
+              <Text style={styles.stateText}>Semua karyawan memenuhi 40 jam minggu ini</Text>
+            </View>
+          ) : (
+            stats.below40Hours.map((e) => (
+              <View key={e.email} style={styles.hoursRow}>
+                <View style={styles.hoursInfo}>
+                  <Text style={styles.hoursName}>{e.userName}</Text>
+                  <Text style={styles.hoursMeta}>{e.divisionName ?? 'Tanpa Divisi'}</Text>
+                </View>
+                <Text style={styles.hoursValue}>{formatJamMenit(e.totalMinutes)}</Text>
+              </View>
+            ))
+          )}
         </>
       )}
     </ScrollView>
@@ -388,6 +421,43 @@ const styles = StyleSheet.create({
   },
   leaveRowSpacing: {
     borderTopWidth: 0,
+  },
+  stateBox: {
+    alignItems: 'center',
+    paddingVertical: spacing.lg,
+  },
+  stateText: {
+    fontFamily: fontFamily.regular,
+    fontSize: 12,
+    color: colors.ink60,
+  },
+  hoursRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.ink12,
+    paddingVertical: spacing.md,
+  },
+  hoursInfo: {
+    flex: 1,
+    gap: 2,
+  },
+  hoursName: {
+    ...typography.label,
+    fontSize: 11,
+    color: colors.ink,
+  },
+  hoursMeta: {
+    fontFamily: fontFamily.regular,
+    fontSize: 11,
+    color: colors.ink60,
+  },
+  hoursValue: {
+    ...numerals,
+    fontFamily: fontFamily.semibold,
+    fontSize: 12,
+    color: colors.red,
   },
   leaveCount: {
     ...typography.d3,
