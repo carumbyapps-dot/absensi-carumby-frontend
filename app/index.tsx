@@ -165,6 +165,13 @@ export default function HomeScreen() {
             onPress={() => router.push('/cuti')}
           />
           <MenuCard
+            icon="swap-horizontal-outline"
+            iconColor={colors.ink}
+            title="Ajukan Shift"
+            subtitle="Ajukan jam kerja untuk tanggal tertentu, ditinjau admin"
+            onPress={() => router.push('/shift')}
+          />
+          <MenuCard
             icon="calendar-clear-outline"
             iconColor={colors.ink}
             title="Kalender Libur"

@@ -17,6 +17,12 @@ export default function AdminMenuScreen() {
           onPress={() => router.push('/admin/approve')}
         />
         <MenuCard
+          icon="swap-horizontal-outline"
+          title="Persetujuan Shift"
+          subtitle="Tinjau pengajuan shift — disetujui langsung masuk jadwal"
+          onPress={() => router.push('/admin/shift')}
+        />
+        <MenuCard
           icon="megaphone-outline"
           title="Pengumuman"
           subtitle="Kirim himbauan ke semua karyawan"

@@ -39,6 +39,7 @@ interface AdminStats {
   perDivision: StatsDivision[];
   last7Days: StatsDay[];
   pendingLeaves: number;
+  pendingShiftRequests: number;
 }
 
 const DAY_LABEL = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
@@ -173,15 +174,27 @@ export default function AdminStatistikScreen() {
             })}
           </View>
 
-          <Text style={[styles.sectionLabel, styles.sectionSpacing]}>Cuti & Izin</Text>
+          <Text style={[styles.sectionLabel, styles.sectionSpacing]}>Persetujuan</Text>
           <View style={styles.leaveRow}>
             <View>
               <Text style={styles.leaveCount}>{stats.pendingLeaves}</Text>
-              <Text style={styles.leaveText}>Pengajuan menunggu keputusan</Text>
+              <Text style={styles.leaveText}>Pengajuan cuti menunggu</Text>
             </View>
             <Pressable
               style={({ pressed }) => [styles.reviewBtn, pressed && styles.pressed]}
               onPress={() => router.push('/admin/approve')}
+            >
+              <Text style={styles.reviewBtnText}>Tinjau</Text>
+            </Pressable>
+          </View>
+          <View style={[styles.leaveRow, styles.leaveRowSpacing]}>
+            <View>
+              <Text style={styles.leaveCount}>{stats.pendingShiftRequests}</Text>
+              <Text style={styles.leaveText}>Pengajuan shift menunggu</Text>
+            </View>
+            <Pressable
+              style={({ pressed }) => [styles.reviewBtn, pressed && styles.pressed]}
+              onPress={() => router.push('/admin/shift')}
             >
               <Text style={styles.reviewBtnText}>Tinjau</Text>
             </Pressable>
@@ -372,6 +385,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.ink12,
     padding: spacing.lg,
+  },
+  leaveRowSpacing: {
+    borderTopWidth: 0,
   },
   leaveCount: {
     ...typography.d3,
