@@ -106,8 +106,8 @@ export default function AdminJadwalScreen() {
       Alert.alert('Jam tidak valid', 'Jam selesai harus format HH:MM 24 jam (mis. 21:00).');
       return;
     }
-    if (startTime >= endTime) {
-      Alert.alert('Jam tidak valid', 'Jam selesai harus setelah jam mulai.');
+    if (startTime === endTime) {
+      Alert.alert('Jam tidak valid', 'Jam mulai dan jam selesai tidak boleh sama. (Jam selesai lebih kecil = shift lintas malam, mis. 19:00–00:00.)');
       return;
     }
     setBusy(true);

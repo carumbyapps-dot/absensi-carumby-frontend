@@ -36,6 +36,13 @@ const STATUS_LABEL: Record<ShiftStatus, string> = {
   cancelled: 'Dibatalkan',
 };
 
+const SHIFT_PRESETS = [
+  { label: '08:00 – 17:00', start: '08:00', end: '17:00' },
+  { label: '09:00 – 18:00', start: '09:00', end: '18:00' },
+  { label: '13:00 – 21:00', start: '13:00', end: '21:00' },
+  { label: '19:00 – 00:00', start: '19:00', end: '00:00' },
+];
+
 function formatTanggal(date: string): string {
   const [y, m, d] = date.split('-').map(Number);
   return `${d} ${MONTH_LABEL[m - 1]} ${y}`;
@@ -115,6 +122,23 @@ export default function ShiftScreen() {
       <Text style={styles.sectionLabel}>Ajukan Shift</Text>
       <View style={styles.form}>
         <DateField label="Tanggal Shift" value={date} onChange={setDate} />
+        <View style={styles.presetRow}>
+          {SHIFT_PRESETS.map((p) => {
+            const active = startTime === p.start && endTime === p.end;
+            return (
+              <Pressable
+                key={p.label}
+                style={({ pressed }) => [styles.preset, active && styles.presetActive, pressed && styles.pressed]}
+                onPress={() => {
+                  setStartTime(p.start);
+                  setEndTime(p.end);
+                }}
+              >
+                <Text style={[styles.presetText, active && styles.presetTextActive]}>{p.label}</Text>
+              </Pressable>
+            );
+          })}
+        </View>
         <View style={styles.timeRow}>
           <View style={styles.timeCol}>
             <Text style={styles.fieldLabel}>Jam Mulai</Text>
@@ -231,6 +255,29 @@ const styles = StyleSheet.create({
   form: {
     marginTop: spacing.md,
     gap: spacing.md,
+  },
+  presetRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+  },
+  preset: {
+    borderWidth: 1,
+    borderColor: colors.ink12,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  presetActive: {
+    borderColor: colors.ink,
+    backgroundColor: colors.ink,
+  },
+  presetText: {
+    ...typography.label,
+    fontSize: 10,
+    color: colors.ink60,
+  },
+  presetTextActive: {
+    color: colors.bone,
   },
   fieldLabel: {
     ...typography.label,
