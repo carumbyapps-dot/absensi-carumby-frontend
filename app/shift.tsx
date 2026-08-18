@@ -36,12 +36,10 @@ const STATUS_LABEL: Record<ShiftStatus, string> = {
   cancelled: 'Dibatalkan',
 };
 
-const SHIFT_PRESETS = [
-  { label: '08:00 – 17:00', start: '08:00', end: '17:00' },
-  { label: '09:00 – 18:00', start: '09:00', end: '18:00' },
-  { label: '13:00 – 21:00', start: '13:00', end: '21:00' },
-  { label: '19:00 – 00:00', start: '19:00', end: '00:00' },
-];
+interface ScheduleInfo {
+  startTime: string;
+  endTime: string;
+}
 
 function formatTanggal(date: string): string {
   const [y, m, d] = date.split('-').map(Number);
@@ -54,20 +52,64 @@ export default function ShiftScreen() {
   const [date, setDate] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
+  const [autoSource, setAutoSource] = useState('');
   const [reason, setReason] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [busyId, setBusyId] = useState<number | null>(null);
+  const [schedules, setSchedules] = useState<Record<string, ScheduleInfo>>({});
 
   const load = useCallback(async () => {
     try {
-      const res = await apiFetch<{ requests: ShiftRequestRecord[] }>('/api/shifts/requests');
-      setRequests(res.requests);
+      const now = new Date();
+      const months = [
+        { y: now.getFullYear(), m: now.getMonth() + 1 },
+        now.getMonth() + 2 > 12
+          ? { y: now.getFullYear() + 1, m: now.getMonth() + 2 - 12 }
+          : { y: now.getFullYear(), m: now.getMonth() + 2 },
+      ];
+      const [mine, ...scheds] = await Promise.all([
+        apiFetch<{ requests: ShiftRequestRecord[] }>('/api/shifts/requests'),
+        ...months.map(({ y, m }) =>
+          apiFetch<{ schedules: { date: string; startTime: string; endTime: string }[] }>(
+            `/api/schedules/mine?year=${y}&month=${m}`,
+          ),
+        ),
+      ]);
+      setRequests(mine.requests);
+      const map: Record<string, ScheduleInfo> = {};
+      scheds.forEach((r) => r.schedules.forEach((s) => (map[s.date] = { startTime: s.startTime, endTime: s.endTime })));
+      setSchedules(map);
+      const today = toDateKey(new Date());
+      setDate(today);
+      applyAuto(today, map);
     } catch (err) {
       Alert.alert('Gagal memuat', getErrorMessage(err));
     } finally {
       setLoading(false);
     }
   }, []);
+
+  const applyAuto = (key: string, map: Record<string, ScheduleInfo>) => {
+    if (map[key]) {
+      setStartTime(map[key].startTime);
+      setEndTime(map[key].endTime);
+      setAutoSource('Jam dari jadwal Anda pada tanggal ini');
+      return;
+    }
+    const past = Object.keys(map)
+      .filter((d) => d < key)
+      .sort()
+      .pop();
+    if (past) {
+      setStartTime(map[past].startTime);
+      setEndTime(map[past].endTime);
+      setAutoSource('Jam menyalin shift terakhir Anda — ubah bila perlu');
+      return;
+    }
+    setStartTime('08:00');
+    setEndTime('17:00');
+    setAutoSource('Jam default 08:00–17:00 — ubah bila perlu');
+  };
 
   useEffect(() => {
     load();
@@ -121,24 +163,14 @@ export default function ShiftScreen() {
     >
       <Text style={styles.sectionLabel}>Ajukan Shift</Text>
       <View style={styles.form}>
-        <DateField label="Tanggal Shift" value={date} onChange={setDate} />
-        <View style={styles.presetRow}>
-          {SHIFT_PRESETS.map((p) => {
-            const active = startTime === p.start && endTime === p.end;
-            return (
-              <Pressable
-                key={p.label}
-                style={({ pressed }) => [styles.preset, active && styles.presetActive, pressed && styles.pressed]}
-                onPress={() => {
-                  setStartTime(p.start);
-                  setEndTime(p.end);
-                }}
-              >
-                <Text style={[styles.presetText, active && styles.presetTextActive]}>{p.label}</Text>
-              </Pressable>
-            );
-          })}
-        </View>
+        <DateField
+          label="Tanggal Shift"
+          value={date}
+          onChange={(key) => {
+            setDate(key);
+            applyAuto(key, schedules);
+          }}
+        />
         <View style={styles.timeRow}>
           <View style={styles.timeCol}>
             <Text style={styles.fieldLabel}>Jam Mulai</Text>
@@ -157,12 +189,13 @@ export default function ShiftScreen() {
               style={styles.input}
               value={endTime}
               onChangeText={setEndTime}
-              placeholder="17:00"
+              placeholder="00:00"
               placeholderTextColor={colors.ink38}
               keyboardType="numbers-and-punctuation"
             />
           </View>
         </View>
+        {autoSource !== '' && <Text style={styles.autoHint}>{autoSource}</Text>}
         <Text style={styles.fieldLabel}>Alasan</Text>
         <TextInput
           style={[styles.input, styles.reasonInput]}
@@ -256,28 +289,10 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     gap: spacing.md,
   },
-  presetRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
-  },
-  preset: {
-    borderWidth: 1,
-    borderColor: colors.ink12,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-  },
-  presetActive: {
-    borderColor: colors.ink,
-    backgroundColor: colors.ink,
-  },
-  presetText: {
-    ...typography.label,
-    fontSize: 10,
-    color: colors.ink60,
-  },
-  presetTextActive: {
-    color: colors.bone,
+  autoHint: {
+    fontFamily: fontFamily.regular,
+    fontSize: 11,
+    color: colors.lumut,
   },
   fieldLabel: {
     ...typography.label,
