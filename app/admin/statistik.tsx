@@ -36,6 +36,7 @@ interface StatsBelowHours {
 
 interface AdminStats {
   date: string;
+  week: { start: string; end: string };
   summary: {
     activeEmployees: number;
     checkedIn: number;
@@ -56,6 +57,11 @@ function formatJamMenit(totalMinutes: number): string {
   return `${h}j ${m}m`;
 }
 
+function formatTanggalPendek(date: string): string {
+  const [y, m, d] = date.split('-').map(Number);
+  return `${d} ${MONTH_LABEL[m - 1].slice(0, 3)}`;
+}
+
 const DAY_LABEL = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
 
 function formatTanggal(date: string): string {
@@ -72,11 +78,12 @@ export default function AdminStatistikScreen() {
   const router = useRouter();
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [weekOffset, setWeekOffset] = useState(0);
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (offset: number) => {
     setLoading(true);
     try {
-      const res = await apiFetch<AdminStats>('/api/admin/stats');
+      const res = await apiFetch<AdminStats>(`/api/admin/stats?weekOffset=${offset}`);
       setStats(res);
     } catch (err) {
       Alert.alert('Gagal memuat statistik', getErrorMessage(err));
@@ -86,8 +93,8 @@ export default function AdminStatistikScreen() {
   }, []);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    load(weekOffset);
+  }, [load, weekOffset]);
 
   if (loading && !stats) {
     return (
@@ -107,7 +114,7 @@ export default function AdminStatistikScreen() {
           <Text style={styles.dateText}>{stats ? formatTanggal(stats.date) : ''}</Text>
         </View>
         <View style={styles.headerActions}>
-          <Pressable style={({ pressed }) => [styles.refreshBtn, pressed && styles.pressed]} onPress={load}>
+          <Pressable style={({ pressed }) => [styles.refreshBtn, pressed && styles.pressed]} onPress={() => load(weekOffset)}>
             <Text style={styles.refreshText}>Muat Ulang</Text>
           </Pressable>
           <Pressable
@@ -214,9 +221,31 @@ export default function AdminStatistikScreen() {
             </Pressable>
           </View>
 
-          <Text style={[styles.sectionLabel, styles.sectionSpacing]}>
-            Di Bawah 40 Jam Minggu Ini ({stats.below40Hours.length})
-          </Text>
+          <View style={styles.hoursHeader}>
+            <Text style={[styles.sectionLabel, styles.sectionSpacing]}>
+              Di Bawah 40 Jam ({stats.below40Hours.length})
+            </Text>
+            <View style={styles.weekNav}>
+              <Pressable
+                style={({ pressed }) => [styles.weekBtn, pressed && styles.pressed]}
+                disabled={weekOffset <= -10}
+                onPress={() => setWeekOffset((o) => o - 1)}
+              >
+                <Text style={styles.weekBtnText}>‹</Text>
+              </Pressable>
+              <Text style={styles.weekLabel}>
+                {stats.week?.start ? formatTanggalPendek(stats.week.start) : ''} –{' '}
+                {stats.week?.end ? formatTanggalPendek(stats.week.end) : ''}
+              </Text>
+              <Pressable
+                style={({ pressed }) => [styles.weekBtn, pressed && styles.pressed]}
+                disabled={weekOffset >= 0}
+                onPress={() => setWeekOffset((o) => o + 1)}
+              >
+                <Text style={styles.weekBtnText}>›</Text>
+              </Pressable>
+            </View>
+          </View>
           {stats.below40Hours.length === 0 ? (
             <View style={styles.stateBox}>
               <Text style={styles.stateText}>Semua karyawan memenuhi 40 jam minggu ini</Text>
@@ -438,6 +467,36 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.ink12,
     paddingVertical: spacing.md,
+  },
+  hoursHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+  },
+  weekNav: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginTop: spacing.xl,
+  },
+  weekBtn: {
+    width: 28,
+    height: 28,
+    borderWidth: 1,
+    borderColor: colors.ink,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  weekBtnText: {
+    ...typography.label,
+    fontSize: 12,
+    color: colors.ink,
+  },
+  weekLabel: {
+    fontFamily: fontFamily.semibold,
+    fontSize: 11,
+    color: colors.ink60,
+    ...numerals,
   },
   hoursInfo: {
     flex: 1,
