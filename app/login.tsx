@@ -75,8 +75,9 @@ export default function LoginScreen() {
         <View style={styles.brand}>
           <BrandMark size={72} />
           <Text style={styles.brandTitle}>ANTRAC</Text>
+          <Text style={styles.brandTagline}>Antara aku dan Carumby</Text>
           <Text style={styles.brandSubtitle}>
-            Catat kehadiranmu dengan cepat, aman, dan mudah
+            Catat kehadiran dengan cepat, aman, dan mudah
           </Text>
         </View>
 
@@ -168,6 +169,12 @@ const styles = StyleSheet.create({
     ...typography.d2,
     fontSize: 24,
     color: colors.ink,
+  },
+  brandTagline: {
+    fontFamily: fontFamily.semibold,
+    fontSize: font.body,
+    color: colors.ink,
+    textAlign: 'center',
   },
   brandSubtitle: {
     fontFamily: fontFamily.regular,
